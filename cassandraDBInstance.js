@@ -17,7 +17,7 @@ if (!config.shouldWriteToDb) {
 	cassandraDbInstance = new cassandraDriver.Client({
 		contactPoints: database.nodes,
 		keyspace: database.keyspace,
-		localDataCenter: 'datacenter1'
+		localDataCenter: 'datacenter1'//todo change as for your name
 	});
 }
 
