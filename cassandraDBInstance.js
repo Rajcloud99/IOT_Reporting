@@ -16,8 +16,8 @@ if (!config.shouldWriteToDb) {
 	console.log('connected to cassandra nodes '+database.nodes.toString());
 	cassandraDbInstance = new cassandraDriver.Client({
 		contactPoints: database.nodes,
-		keyspace: database.keyspace,
-		localDataCenter: 'ap-southeast_1_cassandra',
+		keyspace: database.keyspace
+		//localDataCenter: 'ap-southeast_1_cassandra',
 	});
 }
 
