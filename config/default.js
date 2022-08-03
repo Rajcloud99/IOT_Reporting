@@ -23,8 +23,8 @@ module.exports = {
 	"tracksheetCronTime":720000,
 	"tripSyncCronTime":59,//in minutes
 	"database": {
-		//"nodes": ["localhost"],
-        "nodes":["15.206.33.235","101.53.139.123"],
+		"nodes": ["localhost"],
+        //"nodes":["15.206.33.235","101.53.139.123"],
 		"keyspace": "gps_ups",
         "enable_email": true,
         "enable_sms": true,
