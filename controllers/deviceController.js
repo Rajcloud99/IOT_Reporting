@@ -1,6 +1,8 @@
 const BPromise = require('bluebird');
 const router = require('express').Router();
 const User = require('../model/user');
+const moment = require('moment');
+const excelService = require('../services/excelService');
 const winston = require('../utils/logger');
 const Device = BPromise.promisifyAll(require('../model/device'));
 const GpsGaadi = require('../model/gpsgaadi');
@@ -192,6 +194,7 @@ router.post('/deregister_device', function (req, res) {
         });
     });
 });
+
 router.post('/get_device', function (req, res) {
     let response = {
         status: 'ERROR',
@@ -235,11 +238,107 @@ router.post('/get_device', function (req, res) {
     });
 });
 
+router.post('/get_deviceFlvl', function (req, res) {
+    let response = {
+        status: 'ERROR',
+        message: ""
+    };
+    if(req.body.vehicle_no){
+        response.response = req.body.vehicle_no;
+    }
+    if(!req.body.selected_uid){
+        response.message = 'selected_uid not provided';
+        return res.json(response);
+    }
+    if(!req.body.device_id){
+        response.message = 'Imei should be provided'
+        return res.json(response);
+    }
+    if(!req.body.from || !req.body.to){
+        response.message = 'Date should be provided'
+        return res.json(response);
+    }
+    let oReq = {};
+    if(req.body.from && req.body.to){
+        oReq.from = req.body.from;
+        oReq.to = req.body.to;
+    }
+    if(req.body.device_id){
+        if(req.body.device_id instanceof Array){
+            oReq.device_id = req.body.device_id;
+        }else{
+            oReq.device_id = [req.body.device_id];
+        }
+    }
+    let end = moment(req.body.to);
+    let start = moment(req.body.from);
+    let daysDiff = end.diff(start, 'days');
+    if(daysDiff > 7){
+        response.message = 'Date gap not be greater tha 7 days'
+        return res.json(response);
+    }
+    let timeGap = 10;
+    if(req.body.timeGap){
+        timeGap = req.body.timeGap;
+    }
+    oReq.selected_uid = req.body.selected_uid || req.body.user_id;
+    GpsGaadi.getFlvliList(oReq,function(err,gResp){
+        if (err) {
+            response.message = err.message;
+            return res.json(response);
+        }
+        if(gResp && gResp.data){
+            response.data = gResp.data;
+            response.data = response.data.filter(item =>item.f_lvl !== null);
+            if(response.data && response.data[0]){
+                response.data = timeGapCalculate(response.data,timeGap);
+            }
+            if(req.body.download){
+                response.login_uid = req.body.login_uid;
+                response.start_time = req.body.from;
+                response.end_time = req.body.to;
+                excelService.getfuelLevelReport(response, obj => {
+                    response.status = 'OK';
+                    response.message = 'Fuel level Report';
+                    response.data = obj.url;
+                    return res.status(200).json(response);
+                });
+            }else{
+                response.status = 'OK';
+                response.message = 'Fuel data get successfully';
+                return res.json(response);
+            }
+        }
+    });
+});
+
 router.post('/dummy', function (req, res) {
     landmarkService.getNearestLandmarkForPoint(req.body, resp => {
         res.status(200).json(resp);
     });
 });
+
+function timeGapCalculate(data, time) {
+    let arr = [];
+    // sort the data first
+    data.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+    arr.push(data[0]);
+    // 1 min 60000 milisecond
+    let gap = time * 60000;
+    var stGetTime = 0, endGetTime =  0 ;
+    for (let i = 0; i < data.length; i++) {
+        stGetTime = data[i].datetime.getTime();
+        for (let j = i +1 ; j < data.length; j++) {
+           endGetTime = data[j].datetime.getTime();
+           if((endGetTime - stGetTime) > gap){
+               arr.push(data[j]);
+               i = j;
+               break;
+           }
+        }
+    }
+    return arr;
+}
 
 
 

@@ -18,6 +18,8 @@ function Gps(oDevice) {
     this.mnc = oDevice.mnc;
     this.gps_tracking = oDevice.gps_tracking;
     this.ignition = oDevice.ignition;
+    this.fl = oDevice.fl;
+    this.f_lvl = oDevice.f_lvl;
 }
 
 Gps.getImei = function (reg_no, callback) {
@@ -121,9 +123,9 @@ Gps.getCurrentLocationsFromImei = function (deviceid, callback) {
 Gps.getGPSDataBetweenTime = function (deviceid, starttime, endtime, callback) {
     let query;
     if (deviceid instanceof Array) {
-        query = 'SELECT device_id, datetime, latitude, longitude, speed, course,gps_tracking,ignition FROM ' + database.table_gps_data + ' WHERE device_id IN (' + deviceid.join(', ') + ') AND datetime >= ' + new Date(starttime).getTime() + ' AND datetime <= ' + new Date(endtime).getTime();
+        query = 'SELECT device_id, fl , f_lvl, datetime, latitude, longitude, speed, course,gps_tracking,ignition FROM ' + database.table_gps_data + ' WHERE device_id IN (' + deviceid.join(', ') + ') AND datetime >= ' + new Date(starttime).getTime() + ' AND datetime <= ' + new Date(endtime).getTime();
     } else {
-        query = 'SELECT datetime, latitude, longitude, speed, course,gps_tracking,ignition FROM ' + database.table_gps_data + ' WHERE device_id = ' + deviceid + ' AND datetime >= ' + new Date(starttime).getTime() + ' AND datetime <= ' + new Date(endtime).getTime() + ' ORDER BY datetime ASC ALLOW FILTERING';
+        query = 'SELECT datetime , fl , f_lvl, latitude, longitude, speed, course,gps_tracking,ignition FROM ' + database.table_gps_data + ' WHERE device_id = ' + deviceid + ' AND datetime >= ' + new Date(starttime).getTime() + ' AND datetime <= ' + new Date(endtime).getTime() + ' ORDER BY datetime ASC ALLOW FILTERING';
     }
     const options = {prepare: true, fetchSize: 1000};
     let gpsData = [];

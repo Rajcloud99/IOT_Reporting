@@ -186,6 +186,43 @@ GpsGaadi.getGpsGaadiList = function (request, callback) {
 		callback(err, oRes);
 	});
 };
+GpsGaadi.getFlvliList = function (request, callback) {
+	const oConfig = {
+		prepare: 1
+	};
+	let query;
+	let aParams;
+
+	if (request.device_id) {
+		query = 'SELECT datetime,fl,f_lvl FROM ' + database.table_gps_data +  ' WHERE device_id IN(?) ' + ' AND  datetime >= ? AND datetime <=? ORDER BY datetime DESC LIMIT 8000 ALLOW FILTERING';
+		aParams = [request.device_id.join(","),request.from,request.to];
+	}
+	if(!query){
+		console.log('query',query,aParams,request.selected_uid ,request.login_uid);
+		return callback(null, {data:[]});
+	}
+	if (request.reg_no) {
+		query = query + " ALLOW FILTERING";
+	}
+	cassandraDbInstance.execute(query,aParams , oConfig, function (err, result) {
+		if (err) {
+			winston.error('GpsGaadi.getGpsGaadiList'+ aParams, err);
+			callback(err);
+			return;
+		}
+		if (!result || !result.rows || result.rows.length === 0){
+			return callback(null, {data:[]});
+		}
+		const oRes = {};
+		if (result && result.rows) {
+			oRes.data = result.rows;
+		}
+		if (result && result.meta) {
+			oRes.pageState = result.meta.pageState;
+		}
+		callback(err, oRes);
+	});
+};
 
 const updateGpsGaadis = function (req, res, callback) {
 	const aQueries = [];

@@ -130,6 +130,7 @@ function createAlarm(request, callback) {
 		createAlarmHelper(request, callback);
 	}
 }
+
 function removeAlarm(request, callback) {
 	Alarm.removeAlarm(request, function (err, res) {
 		const response = {status: 'ERROR', message: ""};
@@ -149,7 +150,30 @@ function removeAlarm(request, callback) {
 	});
 }
 
+function addAlarm(request, callback) {
+	Alarm.createAlarm(request, function (err, res) {
+		const response = {status: 'ERROR', message: "", index: request.index};
+		if (err) {
+			response.message = err.toString();
+		} else if (!res) {
+			response.message = 'Alarm registration failed';
+		} else {
+			response.status = 'OK';
+			response.message = request.atype + ' alarm setup done succefully';
+			response.atype = request.atype;
+			response.imei = request.imei;
+			response.vehicle_no = request.vehicle_no;
+			if(request.imei){
+				require('../utils/receivermanager').sendAlarmUpdate(request.imei);
+			}
+		}
+		return callback(response);
+	});
+}
+
 module.exports.createAlarm = createAlarm;
 module.exports.getAlarm = getAlarm;
 module.exports.updateAlarm = updateAlarm;
 module.exports.removeAlarm = removeAlarm;
+module.exports.addAlarm = addAlarm;
+

@@ -22,6 +22,17 @@ router.post('/create', function (req, res) {
         res.status(200).json(resp);
     });
 });
+//for lms lite mongo
+router.post('/add', function (req, res) {
+    let request = req.body;
+    return alarmService.addAlarm(request, response => {
+        let resp = {
+            status:'OK',
+            data:response
+        };
+        res.status(200).json(resp);
+    });
+});
 
 router.post('/update', function (req, res) {
     let request = req.body;

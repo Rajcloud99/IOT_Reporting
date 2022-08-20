@@ -3,10 +3,9 @@ const async = require('async');
 const BPromise = require('bluebird');
 
 const osmIp = '52.220.18.209';
-//52.220.18.209/reverse?format=json&lat=18.795154571533203&lng=77.5494384765625&zoom=18&addressdetails=0
 exports.getAddressFromServer = function(ip, lat, lng, callback) {
 	//const url = "http://"+ip+"/reverse?format=json&lat=" + lat + "&lon=" + lng + "&zoom=18&addressdetails=0";
-    const url = "http://13.229.178.235:4242/reverse?lat=" + lat + "&lon=" + lng;
+    const url = config.geographyUrl + "/reverse?lat=" + lat + "&lon=" + lng;
 	request(url, {
 		timeout: 5000
 	}, function (error, response, body) {
@@ -32,7 +31,7 @@ exports.getAddress = function (lat, lng, callback) {
 exports.getAlertsFromGeography = function (query, callback) {
 	if (process.env.NODE_ENV === 'servertest') return callback(null, null);
 	//const url = "http://localhost:4242/alert/get";
-	const url = "http://13.229.178.235:4242/alert/get";
+	const url = config.geographyUrl + "/alert/get";
 	var options = {
 		method: 'POST',
 		url: url,
@@ -113,7 +112,7 @@ exports.fillAddressForStop = function (data, callback) {
 exports.getLandmarkFromGeography = function (query, callback) {
 	if (process.env.NODE_ENV === 'servertest') return callback(null, null);
 	//const url = "http://localhost:4242/landmark/get";
-	const url = "http://13.229.178.235:4242/landmark/get";
+	const url = config.geographyUrl + "/landmark/get";
 
 	var options = {
 		method: 'POST',
@@ -140,9 +139,7 @@ exports.getLandmarkFromGeography = function (query, callback) {
 };
 exports.getLandmarkFromGeographyMaulti = function (query, callback) {
 	if (process.env.NODE_ENV === 'servertest') return callback(null, null);
-	//const url = "http://localhost:4242/landmark/get";
-	const url = "http://13.229.178.235:4242/landmark/get";
-
+	const url = config.geographyUrl + "/landmark/get";
 	var options = {
 		method: 'POST',
 		url: url,
@@ -168,7 +165,7 @@ exports.getLandmarkFromGeographyMaulti = function (query, callback) {
 };
 exports.getBeatFromGeography = function (query, callback) {
 	if (process.env.NODE_ENV === 'servertest') return callback(null, null);
-	const url = "http://13.229.178.235:4242/beat/get";
+	const url = config.geographyUrl + "/beat/get";
 
 	var options = {
 		method: 'POST',

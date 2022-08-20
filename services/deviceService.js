@@ -2823,12 +2823,13 @@ function calculateSpeedFromRaw(data,callback) {
 };
 
 exports.processRawData = function (imei, data, callback) {
-	let drive, nSkip = 0, duration = 0, distance = 0, oAdas = { imei: imei, distance: 0, duration: 0, nSkip: 0, top_speed: 0 }, aAdas = [];
+	let drive, nSkip = 0, duration = 0, distance = 0, oAdas = { imei: imei , distance: 0, duration: 0, nSkip: 0, top_speed: 0 }, aAdas = [];
 	for (let i = 1; i < data.length; i++) {
 		if (!oAdas.points) {
 			oAdas.points = [];
 		}
 		oAdas.imei = imei;
+		oAdas.fl = data[i].fl;
 		duration = data[i].datetime - data[i - 1].datetime;//msec
 		duration = duration / 1000; //sec
 		distance = geozoneCalculator.getDistance({ latitude: data[i - 1].latitude, longitude: data[i - 1].longitude }, {

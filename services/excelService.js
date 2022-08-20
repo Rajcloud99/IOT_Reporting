@@ -119,7 +119,7 @@ exports.getParkingReport = function (data, callback) {
         ws.getCell('E5').value = 'Total Stop Duration : ' + dateutils.getDurationFromSecs(device.dur_stop);
 
 
-        formatColumnHeaders(ws, 9, ['START TIME', 'END TIME', 'STATUS', 'DURATION', 'LOCATION', 'NEAREST LANDMARK'], [20, 20, 10, 10, 60, 50]);
+        formatColumnHeaders(ws, 9, ['START TIME', 'END TIME', 'STATUS', 'DURATION', 'LOCATION', 'NEAREST LANDMARK', 'FUEL CONSUME'], [20, 20, 10, 10, 60, 50]);
         for (let i = 0; i < device.data.length; i++) {
 
             ws.getCell('A' + (i + 10)).value = dateutils.getFormattedDateTimeByZone(device.data[i].start_time, timezone);
@@ -135,6 +135,11 @@ exports.getParkingReport = function (data, callback) {
                 }
             } else {
                 ws.getCell('F' + (i + 10)).value = device.data[i].nearest_landmark ? device.data[i].nearest_landmark.dist / 1000 + "KM from " + device.data[i].nearest_landmark.name : 'NA';
+            }
+            if(device.data[i].points && device.data[i].points[0]){
+                ws.getCell('G' + (i + 10)).value = ((device.data[i].points[0].f_lvl || 0) - (device.data[i].points[device.data[i].points.length - 1].f_lvl || 0)).toFixed(2);
+            }else{
+                ws.getCell('G' + (i + 10)).value = 0;
             }
         }
     }
@@ -434,7 +439,7 @@ exports.getActivityReport = function (data, callback) {
         if (device.user_id == 'kd') {
             formatColumnHeaders(ws, 13 + offset, ['START TIME', 'ADDRESS', 'END TIME', 'ADDRESS', 'DURATION', 'CATEGORY', 'DISTANCE(Kms)', 'Speed', 'Landmark'], [20, 70, 20, 70, 6, 10, 10, 6, 70]);
         } else {
-            formatColumnHeaders(ws, 13 + offset, ['START TIME', 'ADDRESS', 'END TIME', 'ADDRESS', 'DURATION', 'CATEGORY', 'DISTANCE(Kms)', 'Speed'], [20, 70, 20, 70, 6, 10, 10, 6]);
+            formatColumnHeaders(ws, 13 + offset, ['START TIME', 'ADDRESS', 'END TIME', 'ADDRESS', 'DURATION', 'CATEGORY', 'DISTANCE(Kms)', 'Speed', 'FuelConsume'], [20, 70, 20, 70, 6, 10, 10, 6,15]);
         }
         for (let i = 0; i < device.data.length; i++) {
             ws.getCell('A' + (i + 14 + offset)).value = dateutils.getFormattedDateTime(device.data[i].start_time, timezone);
@@ -453,6 +458,10 @@ exports.getActivityReport = function (data, callback) {
                     ws.getCell('I' + (i + 14 + offset)).value = (device.data[i].ldist / 1000).toFixed(2) + ' Kms from ' + device.data[i].landmark;
                 } else {
                     ws.getCell('I' + (i + 14 + offset)).value = device.data[i].landmark;
+                }
+            }else{
+                if(device.data[i].points && device.data[i].points[0]){
+                    ws.getCell('I' + (i + 14 + offset)).value = ((device.data[i].points[0].f_lvl || 0 )  - (device.data[i].points[device.data[i].points.length - 1].f_lvl || 0)).toFixed(2);
                 }
             }
         }
@@ -1503,7 +1512,7 @@ exports.getIdleReport = function (data, callback) {
 
         let countNoOfIdle = 0, countDurOfIdle = 0;
        
-        formatColumnHeaders(ws, 10 + offset, ['START TIME', 'ADDRESS', 'END TIME', 'DURATION', 'CATEGORY'], [20, 60, 20, 10, 10]);
+        formatColumnHeaders(ws, 10 + offset, ['START TIME', 'ADDRESS', 'END TIME', 'DURATION', 'CATEGORY', 'FUEL CONSUME'], [20, 60, 20, 10, 10, 15]);
 
         for (let i = 0; i < device.data.length; i++) {
             ws.getCell('A' + (i + 11 + offset)).value = dateutils.getFormattedDateTimeByZone(device.data[i].start_time, timezone);
@@ -1513,6 +1522,11 @@ exports.getIdleReport = function (data, callback) {
             if(ws.getCell('E' + (i + 11 + offset)).value === 'idle'){
                 countNoOfIdle++ ;
                 countDurOfIdle += device.data[i].duration;
+            }
+            if(device.data[i].points && device.data[i].points[0]){
+                ws.getCell('F' + (i + 11 + offset)).value = ((device.data[i].points[0].f_lvl || 0) - (device.data[i].points[device.data[i].points.length - 1].f_lvl || 0)).toFixed(2);
+            }else{
+                ws.getCell('F' + (i + 11 + offset)).value = 0;
             }
         }
     ws.getCell('A7').value = 'Total number of idle : ' + countNoOfIdle;
@@ -1577,6 +1591,26 @@ exports.getVehicleIdleSummaryReport = function (data, callback) {
         }  
        }
     saveFileAndReturnCallback(workbook, data.misType || "miscellaneous", data.login_uid, data.start_time, 'idle_vehicle_summary', 'idle_vehicle_summary', callback);
+
+};
+
+exports.getfuelLevelReport = function (data, callback) {
+    let timezone = "Asia/Calcutta";//moment.tz.guess();
+    if (data.timezone) timezone = data.timezone;
+    const workbook = new Excel.Workbook();
+    const ws = workbook.addWorksheet('Fuel Level Report');
+
+    formatTitle(ws, 3, 'Fuel Level Report');
+    formatColumnHeaders(ws, 2, ['S.No' , 'Date', 'Level'], [10, 22, 15]);
+    let i = 1;
+    for(let d = 0;d < data.data.length; d++){
+        ws.getCell('A' + (i + 2)).value = i;
+        ws.getCell('B' + (i + 2)).value = dateutils.getFormattedDateTimeByZone(data.data[d].datetime);
+        ws.getCell('C' + (i + 2)).value = data.data[d].f_lvl;
+        i++;
+    }
+
+    saveFileAndReturnCallback(workbook, data.misType || "miscellaneous", data.login_uid, data.start_time, 'fuel_level', 'fuel_level', callback);
 
 };
 
