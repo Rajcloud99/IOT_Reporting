@@ -2208,5 +2208,6 @@ module.exports = {
 	},
 	limit:{
 		speed:67
-	}
+	},
+	geographyUrl:"http://13.235.119.20:4242"
 };
