@@ -1662,7 +1662,7 @@ function fillAddressEnd(ws, cell, start_row, data, _callback) {
 function saveFileAndReturnCallback(workbook, folderIdentifier, user_id, time, foldername, reportname, callback) {
     //const dir = 'reports/' + user_id + '/' + dateutils.getMMDDYYYY() + '/' + folderIdentifier + '/' + foldername + '/';
     const dir = 'reports/' + user_id + '/' + folderIdentifier + '/' + foldername + '/';
-    const filename = reportname + '_' + dateutils.getYYYYMMDDHHMM(time) + '.xlsx';
+    const filename = reportname + '_' + dateutils.getYYYYMMDDHHMMOld(time) + '.xlsx';
     mkdirp.sync('./files/' + dir);
     const urlFile = 'http://' + externalip + ':8080/' + dir + filename;
 

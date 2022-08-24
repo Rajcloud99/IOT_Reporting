@@ -6,6 +6,7 @@ const excelService = require('../services/excelService');
 const winston = require('../utils/logger');
 const Device = BPromise.promisifyAll(require('../model/device'));
 const GpsGaadi = require('../model/gpsgaadi');
+const activeusersmanager = require("../utils/activeusersmanager");
 const landmarkService = BPromise.promisifyAll(require('../services/landmarkService'));
 
 function validateSelectedUID(req, callback) {
@@ -318,6 +319,45 @@ router.post('/dummy', function (req, res) {
     });
 });
 
+router.post('/update_device', function (req, res) {
+    req.body.user_id = req.body.user_id || req.body.selected_uid || req.body.login_uid;
+    User.getUser(req.body.user_id, function (err, oUser) {
+            if (err) {
+                response.message = err.toString();
+                return res.json(response);
+            } else if (!oUser) {
+                response.message = 'user not found';
+                return res.json(response);
+            } else {
+                if (req.body.reg_no) {
+                    req.body.reg_no = req.body.reg_no.replace(/[^0-9a-z]/gi, '').toUpperCase();
+                }
+                Device.updateDevice(req.body, function (err, resp2) {
+                    let response = {
+                        status: 'ERROR',
+                        message: ""
+                    };
+                    if (err) {
+                        response.message = err.toString();
+                    } else if (!res) {
+                        response.message = 'device update failed';
+                    } else {
+                        response.status = 'OK';
+                        response.message = 'Device update done succefully';
+                        response.data = resp2;
+                        activeusersmanager.addDevice(resp2);
+                        let cb = function (err, resp3) {
+                            winston.error(err);
+                        };
+                        let new_req = Object.assign({}, req.body);
+                        GpsGaadi.updateGpsGaadi(new_req, cb);
+                    }
+                    return res.status(200).json(response);
+                });
+            }
+        });
+});
+
 function timeGapCalculate(data, time) {
     let arr = [];
     // sort the data first
@@ -339,7 +379,5 @@ function timeGapCalculate(data, time) {
     }
     return arr;
 }
-
-
 
 module.exports = router;

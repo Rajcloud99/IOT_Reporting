@@ -112,7 +112,7 @@ exports.getMMDDYYYY = function () {
 	return dMonth + "-" + dDate + "-" + dateNow.getFullYear().toString();
 };
 
-exports.getYYYYMMDDHHMM = function (date) {
+exports.getYYYYMMDDHHMMOld = function (date) {
 	date = new Date(date);
 	let hours = date.getHours();
 	hours = hours < 10 ? '0' + hours : hours;
