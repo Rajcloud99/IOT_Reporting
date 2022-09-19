@@ -5,15 +5,11 @@ const mkdirp = require('mkdirp');
 const Excel = require('exceljs');
 //Excel.config.setValue('promise', require('bluebird'));
 const dateutils = require('../utils/dateutils');
-//const mathutils = require('../utils/mathutils');
 const async = require('async');
-//const request = require('request');
 const activeusersmanager = require('../utils/activeusersmanager');
 const dateUtil = require('../utils/dateutils');
 const otherUtil = require('../utils/otherutils');
 const addressService = require('../services/addressService');
-const externalip = require('../config').externalip;
-//const moment = require('moment-timezone');
 const moment = require('moment');
 const path = require('path');
 
@@ -1664,7 +1660,8 @@ function saveFileAndReturnCallback(workbook, folderIdentifier, user_id, time, fo
     const dir = 'reports/' + user_id + '/' + folderIdentifier + '/' + foldername + '/';
     const filename = reportname + '_' + dateutils.getYYYYMMDDHHMMOld(time) + '.xlsx';
     mkdirp.sync('./files/' + dir);
-    const urlFile = 'http://' + externalip + ':8080/' + dir + filename;
+
+    const urlFile = config.download_url + dir + filename;
 
     workbook.xlsx.writeFile('./files/' + dir + filename).then(function () {
         callback({filename: filename, dir: dir, url: urlFile});

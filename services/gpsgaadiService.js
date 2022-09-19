@@ -1143,39 +1143,97 @@ function fillGpsgaadiWithInfoMongo(sIMEI, res, callback) {
 	});
 }
 
-function fillGpsgaadiWithInfoTracksheetForLMS(res, callback)  {
-	const asyncTasks = [];
-	asyncTasks.push(function (cb) {
-		// winston.info(new Date(), 'getting landmarks');
-		Landmark.getLandmarkAsync(res).then(function (landmarks) {
-			// winston.info(new Date(), 'got landmarks');
-			for (let i = 0; i < res.data.length; i++) {
-				const devLoc = {
-					latitude: res.data[i].lat,
-					longitude: res.data[i].lng
-				};
-				let nearest_landmark;
-				let nearestDist = 1000000000000;
-				for (let j = 0; j < landmarks.length; j++) {
-					const dist = geozoneCalculator.getDistance(landmarks[j].location, devLoc);
-					if (dist < nearestDist) {
-						nearest_landmark = landmarks[j];
-						nearestDist = dist;
-					}
-				}
-				nearest_landmark.dist = nearestDist;
-				res.data[i].nearest_landmark = JSON.parse(JSON.stringify(nearest_landmark));
-				// winston.info(JSON.stringify(nearest_landmark));
-			}
-		}).error(function (err) {
-			//winston.error(err);
-			//console.log(err);
-		}).then(function () {
-			cb();
-		});
-	});
+// function fillGpsgaadiWithInfoTracksheetForLMS(res, callback)  {
+// 	const asyncTasks = [];
+// 	asyncTasks.push(function (cb) {
+// 		// winston.info(new Date(), 'getting landmarks');
+// 		Landmark.getLandmarkAsync(res).then(function (landmarks) {
+// 			// winston.info(new Date(), 'got landmarks');
+// 			for (let i = 0; i < res.data.length; i++) {
+// 				const devLoc = {
+// 					latitude: res.data[i].lat,
+// 					longitude: res.data[i].lng
+// 				};
+// 				let nearest_landmark;
+// 				let nearestDist = 1000000000000;
+// 				for (let j = 0; j < landmarks.length; j++) {
+// 					const dist = geozoneCalculator.getDistance(landmarks[j].location, devLoc);
+// 					if (dist < nearestDist) {
+// 						nearest_landmark = landmarks[j];
+// 						nearestDist = dist;
+// 					}
+// 				}
+// 				nearest_landmark.dist = nearestDist;
+// 				res.data[i].nearest_landmark = JSON.parse(JSON.stringify(nearest_landmark));
+// 				// winston.info(JSON.stringify(nearest_landmark));
+// 			}
+// 		}).error(function (err) {
+// 			//winston.error(err);
+// 			//console.log(err);
+// 		}).then(function () {
+// 			cb();
+// 		});
+// 	});
+//
+// 	asyncTasks.push(function (cb) {
+// 		// winston.info(new Date(), 'getting geozones');
+// 		dbUtil.getAsync(database.table_geozone, ['name', 'geozone', 'ptype', 'radius'], {user_id: res.user_id || res.login_uid}).then(function (geozones) {
+// 			// winston.info(new Date(), 'got geozones', geozones.length);
+//
+// 			for (let i = 0; i < res.data.length; i++) {
+// 				const devLoc = {
+// 					latitude: res.data[i].lat,
+// 					longitude: res.data[i].lng
+// 				};
+//
+// 				if (!devLoc.latitude || !devLoc.longitude) continue;
+//
+// 				for (let j = 0; j < geozones.length; j++) {
+// 					const geozone = geozones[j];
+// 					if (!geozone.geozone || !geozone.geozone[0]) continue;
+//
+// 					let is_inside = false;
+//
+// 					if (geozone.ptype === 'polygon' || geozone.ptype === 'rectangle') {
+// 						is_inside = geozoneCalculator.isPointInside(devLoc, geozone.geozone);
+// 					} else if (geozone.ptype === 'circle') {
+// 						is_inside = geozoneCalculator.isPointInCircle(devLoc, geozone.geozone[0], geozone.radius);
+// 					}
+// 					if (is_inside) {
+// 						res.data[i].geozone = geozone.name;
+// 						res.data[i].geofence = {
+// 							name:geozone.name,
+//                             category:'yard'
+// 						};
+// 						// console.log('is inside');
+// 						break;
+// 					}
+// 				}
+// 			}
+// 		}).catch(function (err) {
+// 			winston.error(err);
+// 		}).then(function () {
+// 			cb();
+// 		});
+// 	});
+// 	async.parallel(asyncTasks, function () {
+// 		// winston.info(new Date(), 'finished fillGpsgaadiWithInfo');
+// 		for (let i = 0; i < res.data.length; i++) {
+// 			if (res.data[i].nearest_landmark && res.data[i].nearest_landmark.dist < 200) {
+// 				res.data[i].addr = res.data[i].nearest_landmark.name;
+// 			}
+// 			if (res.data[i].geozone) {
+// 				res.data[i].addr = res.data[i].geozone;
+// 				delete res.data[i].geozone;
+// 				// winston.info('geozone as address');
+// 			}
+// 		}
+// 		return callback(null, res);
+// 	});
+// }
 
-	asyncTasks.push(function (cb) {
+function fillGpsgaadiWithInfoTracksheetForLMSV2(res, callback)  {
+
 		// winston.info(new Date(), 'getting geozones');
 		dbUtil.getAsync(database.table_geozone, ['name', 'geozone', 'ptype', 'radius'], {user_id: res.user_id || res.login_uid}).then(function (geozones) {
 			// winston.info(new Date(), 'got geozones', geozones.length);
@@ -1200,36 +1258,22 @@ function fillGpsgaadiWithInfoTracksheetForLMS(res, callback)  {
 						is_inside = geozoneCalculator.isPointInCircle(devLoc, geozone.geozone[0], geozone.radius);
 					}
 					if (is_inside) {
-						res.data[i].geozone = geozone.name;
+						res.data[i].addr = geozone.name;
 						res.data[i].geofence = {
 							name:geozone.name,
-                            category:'yard'
+							category:'yard'
 						};
 						// console.log('is inside');
 						break;
 					}
 				}
 			}
+
+			return callback(null, res);
 		}).catch(function (err) {
 			winston.error(err);
-		}).then(function () {
-			cb();
-		});
-	});
-	async.parallel(asyncTasks, function () {
-		// winston.info(new Date(), 'finished fillGpsgaadiWithInfo');
-		for (let i = 0; i < res.data.length; i++) {
-			if (res.data[i].nearest_landmark && res.data[i].nearest_landmark.dist < 200) {
-				res.data[i].addr = res.data[i].nearest_landmark.name;
-			}
-			if (res.data[i].geozone) {
-				res.data[i].addr = res.data[i].geozone;
-				delete res.data[i].geozone;
-				// winston.info('geozone as address');
-			}
-		}
-		return callback(null, res);
-	});
+		})
+
 }
 
 exports.updateGpsGaadi = function (request, callback) {
@@ -1437,7 +1481,7 @@ exports.getTracksheetDataForLMS = function (request, callback) {
 					}
 					response.data = res.data;
 					response.shownField = false;
-					return BPromise.promisify(fillGpsgaadiWithInfoTracksheetForLMS)(response);
+					return BPromise.promisify(fillGpsgaadiWithInfoTracksheetForLMSV2)(response);
 				})
 				.then(function (gpsResp) {
 					callback(gpsResp);

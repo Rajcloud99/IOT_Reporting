@@ -42,4 +42,22 @@ router.get("/dealerinfo",function (req, res, next) {
 	}
 });
 
+router.post("/getAllSubUser", function (req, res, next) {
+	let user = req.body.user_id;
+	User.getUserAsync(user).then(function(oUser){
+		if(oUser && req.body.subUser){
+			let oUser = req.body;
+			oUser.selected_uid = req.body.user_id;
+			let cb = function (err,resp) {
+				if(resp){
+					return res.status(200).json({"status": "OK","message": "User Data found","data":resp});
+				}
+			};
+			return User.getUserById(oUser,cb);
+		}else{
+			return res.status(200).json({"status": "ERROR","message": "Either user_id,user token  are wrong incorrect"});
+		}
+	}).catch(next);
+});
+
 module.exports = router;

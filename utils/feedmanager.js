@@ -49,7 +49,7 @@ class FeedManager {
 			// winston.info('sending live feed data to cb');
 			//console.log(response.data.status);
 			if(response.request == 'live_feedV2'){
-                otherUtil.setStatus(response.data,60);
+                otherUtil.setStatus(response.data,5);
             }
             //console.log(response.data.status);
 			this.callback(response);
@@ -94,7 +94,7 @@ class FeedManager {
 		// if(feedRequestsForDevice[device_id]) return;
 		// winston.info('feedmanager: requesting for feed');
 		if (!device_type) //TODO temporaty
-			device_type = "tr06";
+			device_type = "atlanta_e101";
 		//console.log(feedtype.live_feedV2,device.device_id);
 		this.receivermanager.sendMessage(device.device_id, device_type, feedtype.live_feedV2);
 		this.feedRequestsForDevice[device.device_id] = {destination:device.destination,stop:device.stop,speed:device.speed};
@@ -103,7 +103,7 @@ class FeedManager {
 
 	stopFeed(device_id, device_type) {
 		if (!device_type) //TODO temporaty
-			device_type = "tr06";
+			device_type = "atlanta_e101";
 		if (this.feedRequestsForDevice[device_id]) {
 			// this.receivermanager.sendMessage(device_id, device_type, feedtype.stop_feed);
 			delete this.feedRequestsForDevice[device_id];

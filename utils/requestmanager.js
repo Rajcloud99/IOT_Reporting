@@ -143,6 +143,11 @@ class RequestManager {
 					this.callback(request, response);
 				});
 				break;
+			case requests.get_user:
+				userService.getUser(request, response => {
+					this.callback(request, response);
+				});
+				break;
 			case requests.register_device:
 				deviceService.registerDevice(request, response => {
 					this.callback(request, response);

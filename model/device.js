@@ -6,6 +6,7 @@ const crudUtil = require('../utils/crudutil');
 const dateUtil = require('../utils/dateutils');
 const BPromise = require('bluebird');
 const geozoneCalculator = require('./../services/geozoneCalculator');
+const User = require("./user");
 
 function Device(oDevice) {
 	this.imei = oDevice.imei;
@@ -195,6 +196,37 @@ Device.associateDeviceWithUser = function (request, callback) {
 			winston.error('Device.associateDeviceWithUser no result');
 			return callback(err, null);
 		}
+		User.getUser(request.new_uid, function (err, res) {
+			const response = {status: 'ERROR', message: ""};
+			if (err) {
+				response.message = err.toString();
+			} else if (!res) {
+				response.message = 'user not found';
+			}else{
+				let userData = res;
+				let totalDevice = (userData.total_device || 0) + 1;
+				let totalStock = (userData.stock || 0) + 1;
+				const aParam = [];
+				aParam.push(request.new_uid);
+				const query1 = 'UPDATE ' + database.table_users + ' SET total_device = ' + totalDevice + ', stock =  ' +  totalStock + ' WHERE user_id = ?';
+				cassandraDbInstance.execute(query1, aParam, {prepare: true});
+			}
+		});
+		User.getUser(request.selected_uid, function (err, res) {
+			const response = {status: 'ERROR', message: ""};
+			if (err) {
+				response.message = err.toString();
+			} else if (!res) {
+				response.message = 'user not found';
+			}else{
+				let userData = res;
+				let totalStock = (userData.stock || 0) - 1;
+				const aParam = [];
+				aParam.push(request.selected_uid);
+				const query1 = 'UPDATE ' + database.table_users + ' SET stock = ' + totalStock +  ' WHERE user_id = ?';
+				cassandraDbInstance.execute(query1, aParam, {prepare: true});
+			}
+		});
 		return callback(err, result);
 	});
 };
@@ -216,8 +248,26 @@ Device.registerDevice = function (device, callback) {
 		if (!result) {
 			return callback(err, null);
 		}
+		User.getUser(device.user_id, function (err, res) {
+			const response = {status: 'ERROR', message: ""};
+			if (err) {
+				response.message = err.toString();
+			} else if (!res) {
+				response.message = 'user not found';
+			}else{
+				let userData = res;
+				let totalDevice = (userData.total_device || 0) + 1;
+				let totalStock = (userData.stock || 0) + 1;
+				const aParam = [];
+				aParam.push(device.user_id);
+				const query1 = 'UPDATE ' + database.table_users + ' SET total_device = ' + totalDevice + ', stock =  ' +  totalStock + ' WHERE user_id = ?';
+				cassandraDbInstance.execute(query1, aParam, {prepare: true});
+			}
+		});
 		return callback(err, result);
 	});
+
+
 };
 
 Device.registerDevicesBatch = function (deviceArr, callback) {
@@ -578,6 +628,28 @@ Device.getDevicesWithinPointRadius = function (request,callback) {
         }
     });
 };
+
+Device.fetchDeviceById = async function (userId , callback) {
+	const query = 'SELECT * FROM ' + database.table_device_inventory + " WHERE user_id = "+userId+"";
+	cassandraDbInstance.execute(query,[], function (err, result) {
+		if (err) {
+			winston.error('User.getAllUsers', err);
+			callback(err);
+			return;
+		}
+		if (result && result.rows && result.rows.length === 0) {
+			callback(null, []);
+			return;
+		}
+		if (result && result.rows) {
+			for (const key in result.rows) {
+				result.rows[key] = new User(result.rows[key]);
+			}
+			callback(err, result.rows);
+		}
+	});
+};
+
 
 
 module.exports = Device;

@@ -679,6 +679,7 @@ router.post("/parking", function (req, res, next) {//new version
         deviceService.getPlaybackV4ReportAsync(request)
             .then(resp => {
                 response = resp;
+                response.reg_no = request.regVeh && request.regVeh[0] && request.regVeh[0].reg_no;
                 response.device_id = request.device_id;
                 response.login_uid = request.login_uid;
                 response.start_time = request.start_time;
@@ -708,6 +709,7 @@ router.post("/parking", function (req, res, next) {//new version
         deviceService.getParkingReportAsync(request.device_id, request.start_time, request.end_time, request.minimum_time_in_mins, "web")
             .then(resp => {
                 response = resp;
+                response.reg_no = request.regVeh && request.regVeh[0] && request.regVeh[0].reg_no;
                 response.device_id = request.device_id;
                 response.login_uid = request.login_uid;
                 response.start_time = request.start_time;
@@ -760,6 +762,7 @@ router.post("/activity", function (req, res, next) {//new version
         deviceService.getPlaybackV4ReportAsync(request)
             .then(resp => {
                 response = resp;
+                response.reg_no = request.regVeh && request.regVeh[0] && request.regVeh[0].reg_no;
                 response.device_id = request.device_id;
                 response.login_uid = request.login_uid;
                 response.start_time = request.start_time;
@@ -806,6 +809,8 @@ router.post("/activity", function (req, res, next) {//new version
                 min = new Date() - stdt;
                 console.log('report data resp  ', min / 60000);
                 response = resp;
+                console.log(response);
+                response.reg_no = request.regVeh && request.regVeh[0] && request.regVeh[0].reg_no;
                 response.device_id = request.device_id;
                 response.login_uid = request.login_uid;
                 response.start_time = request.start_time;
@@ -1258,6 +1263,7 @@ router.post("/idealing", function (req, res, next) {//new version
         deviceService.getIdleReportAsync(request)
             .then(resp => {
                 response = resp;
+                response.reg_no = request.regVeh && request.regVeh[0] && request.regVeh[0].reg_no;
                 response.device_id = request.device_id;
                 response.login_uid = request.login_uid;
                 response.start_time = request.start_time;
@@ -1267,7 +1273,7 @@ router.post("/idealing", function (req, res, next) {//new version
             }).then(() => {
                 if(!response.data || !Object.keys(response.data).length){
                     response.status = "ERROR";
-                    response.message = "No data";
+                    response.message = "No data found";
                 }
             if (response.status === 'ERROR') {
                 return res.status(500).json(response);

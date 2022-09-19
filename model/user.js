@@ -22,6 +22,8 @@ function User(oUser) {
 	this.lms_url = oUser.lms_url;
 	this.beat = oUser.beat;
 	this.vehicle_groups = oUser.vehicle_groups;
+	this.total_device = oUser.total_device;
+	this.stock = oUser.stock;
 
 	User.prototype.validPassword = function (pw) {
 		console.log(pw,this.password);
@@ -60,7 +62,6 @@ const prepareCreateQuery = function (oRequest) {
 	return oRet;
 };
 
-
 const prepareCreateQuery2 = function (createObj, allowedFieldsForCreation) {
 	let sQuery = "",
 		sValues = "",
@@ -83,7 +84,6 @@ const prepareCreateQuery2 = function (createObj, allowedFieldsForCreation) {
 	oRet.aParam = aParam;
 	return oRet;
 };
-
 
 const prepareUpdateQuery = function (oAlarm) {
 	let sQuery = "",
@@ -143,9 +143,8 @@ User.getUser = function (user_id, callback) {
 	});
 };
 
-
 User.getAllUsers = function (callback) {
-	const query = 'SELECT user_id,role,access,type,company_name,ip,name,mobile FROM ' + database.table_users;
+	const query = 'SELECT user_id,role,access,type,company_name,ip,name,mobile,total_device,stock  FROM ' + database.table_users;
 	cassandraDbInstance.execute(query, [], function (err, result) {
 		if (err) {
 			winston.error('User.getAllUsers', err);
@@ -185,6 +184,7 @@ function addUserRelation(user, callback) {
 		return callback(err, newUser);
 	});
 }
+
 User.removeUserRelation = function (user, callback) {
 	const query = 'UPDATE ' + database.table_users + ' SET sub_users = ? WHERE user_id = ?';
 	cassandraDbInstance.execute(query, [user.sub_users, user.selected_uid], {
@@ -202,6 +202,7 @@ User.removeUserRelation = function (user, callback) {
 		return callback(err, user);
 	});
 };
+
 User.registerUser = function (user, callback) {
 	user.created_at = Date.now();
 	const oRet = prepareCreateQuery(user);
@@ -222,18 +223,19 @@ User.registerUser = function (user, callback) {
 		//return callback(err, result);
 	});
 };
+
 User.updateUser = function (request, callback) {
 	if (request.request !== 'change_password') {
 		delete request.password;
 		delete request.user_id;
 	}
-	request.selected_uid = request.selected_uid || request.login_uid;
+	request.selected_uid = request.update_uid || request.selected_uid || request.login_uid;
 	request.last_modified = Date.now();
 	request.last_modified_by = request.login_uid;
 	const oQueryParam = prepareUpdateQuery(request);
 	let sQuery = oQueryParam.sQuery;
 	const aParam = oQueryParam.aParam;
-	aParam.push(request.selected_uid || request.login_uid);
+	aParam.push(request.update_uid || request.selected_uid || request.login_uid);
 	sQuery = 'UPDATE ' + database.table_users + ' SET ' + sQuery + ' WHERE user_id = ?';
 	cassandraDbInstance.execute(sQuery, aParam, {
 		prepare: true
@@ -416,6 +418,57 @@ User.getUserFromIp = function (ip, callback) {
 		if (result && result.rows) {
 			const user = new User(result.rows[0]);
 			callback(err, user);
+		}
+	});
+};
+
+User.getUserById = function (request, callback) {
+	request.selected_uid = request.selected_uid || request.login_uid;
+	const oConfig = {
+		prepare: 1
+	};
+	const aParams = [prepareString(request.subUser)];
+	let query = "SELECT mobile,user_id ,email,name, total_device,stock FROM " + database.table_users +  " WHERE user_id IN ("+aParams+")";
+	cassandraDbInstance.execute(query,oConfig, function (err, result) {
+		if (err) {
+			winston.error('User.getUserById', err);
+			callback(err);
+			return;
+		}
+		callback(err, result.rows);
+
+	});
+};
+
+function prepareString(aUsers){
+	str='';
+	for(let i=0;i<aUsers.length;i++){
+		if(i==0){
+			str= "'"+aUsers[i]+"'";
+		} else{
+			str= str+",'"+aUsers[i]+"'";
+		}
+	}
+	return str;
+}
+
+User.getAllUsers1 = function (callback) {
+	const query = 'SELECT user_id,type,name,sub_users,total_device,stock  FROM ' + database.table_users;
+	cassandraDbInstance.execute(query, [], function (err, result) {
+		if (err) {
+			winston.error('User.getAllUsers', err);
+			callback(err);
+			return;
+		}
+		if (result && result.rows && result.rows.length === 0) {
+			callback(null, []);
+			return;
+		}
+		if (result && result.rows) {
+			for (const key in result.rows) {
+				result.rows[key] = new User(result.rows[key]);
+			}
+			callback(err, result.rows);
 		}
 	});
 };

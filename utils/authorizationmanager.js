@@ -183,6 +183,7 @@ class AuthorizationManager {
 			case requests.device_by_uid:
 			case requests.register_device:
 			case requests.sub_users:
+			case requests.get_user:
 			case requests.gpsgaadi_by_uid:
 			case requests.get_devide_types:
 			case requests.gpsgaadi_by_reg_no:
