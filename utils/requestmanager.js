@@ -13,7 +13,6 @@ const gpsgaadiService = BPromise.promisifyAll(require('../services/gpsgaadiServi
 const landmarkService = BPromise.promisifyAll(require('../services/landmarkService'));
 const featureService = BPromise.promisifyAll(require('../services/featureService'));
 const excelService = require('../services/excelService');
-const tripService = require('../services/tripService');
 const shared_locationsService = require('../services/shared_locationsService');
 const mDeviceService = require('../services/mobileDeviceService');
 const NotifPrefs = require('../services/notifPrefService');
