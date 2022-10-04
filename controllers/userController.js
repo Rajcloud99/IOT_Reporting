@@ -7,6 +7,7 @@ const BPromise = require('bluebird');
 const User = BPromise.promisifyAll(require('../model/user'));
 const userService = require('../services/userService');
 const authUtil = require('../utils/authUtil');
+const excelService = require("../services/excelService");
 const router = require('express').Router();
 const externalip = require('../config').externalip;
 
@@ -50,7 +51,15 @@ router.post("/getAllSubUser", function (req, res, next) {
 			oUser.selected_uid = req.body.user_id;
 			let cb = function (err,resp) {
 				if(resp){
-					return res.status(200).json({"status": "OK","message": "User Data found","data":resp});
+					if(req.body.download){
+						resp.login_uid = req.body.login_uid || req.body.selected_uid;
+						resp.start_time = new Date();
+						excelService.getStockReport(resp, obj => {
+							return res.status(200).json({"status": "OK","message": "User Data found","data":obj.url});
+						});
+					}else{
+						return res.status(200).json({"status": "OK","message": "User Data found","data":resp});
+					}
 				}
 			};
 			return User.getUserById(oUser,cb);

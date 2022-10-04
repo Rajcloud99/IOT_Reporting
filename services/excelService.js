@@ -1610,6 +1610,31 @@ exports.getfuelLevelReport = function (data, callback) {
 
 };
 
+exports.getStockReport = function (data, callback) {
+    let timezone = "Asia/Calcutta";//moment.tz.guess();
+    if (data.timezone) timezone = data.timezone;
+    const workbook = new Excel.Workbook();
+    const ws = workbook.addWorksheet('Stock Report');
+
+    formatTitle(ws, 7, 'Stock Report');
+    formatColumnHeaders(ws, 2, ['S.No','Account','Type','User Name','Mobile','Stock','Total' ], [10,15,15,15,15.15,15]);
+    let i = 1;
+    for(let d = 0;d < data.length; d++){
+        ws.getCell('A' + (i + 2)).value = i;
+        ws.getCell('B' + (i + 2)).value = data[d].user_id;
+        ws.getCell('C' + (i + 2)).value = data[d].type;
+        ws.getCell('D' + (i + 2)).value = data[d].name;
+        ws.getCell('E' + (i + 2)).value = parseInt(data[d].mobile);
+        ws.getCell('F' + (i + 2)).value = data[d].stock || 0;
+        ws.getCell('G' + (i + 2)).value = data[d].total_device || 0;
+        i++;
+    }
+
+    saveFileAndReturnCallback(workbook, data.misType || "miscellaneous", data.login_uid, data.start_time, 'stock_report', 'stock_report', callback);
+
+};
+
+
 function fillAddress(ws, cell, start_row, data, _callback) {
     async.eachLimit(data, 100, function (d, callback) {
         if (!d.start) return callback();

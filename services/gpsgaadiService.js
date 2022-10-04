@@ -16,6 +16,7 @@ const async = require('async')
 const cassandraDbInstance = require('../cassandraDBInstance');
 const tracksheetCronTime = require('../config').tracksheetCronTime;
 const mathutils = require('../utils/mathutils');
+const otherUtils = require("../utils/otherutils");
 
 exports.getGpsGaadi = function (request, callback) {
 	GpsGaadi.getGpsGaadi(request, function (err, res) {
@@ -1533,11 +1534,11 @@ exports.getGpsGaadiForTripBasedGps = function (request, callback) {
 								res[i].device_type = deviceResponse.data[k].device_type;
 								//res[i].lat = deviceResponse.data[k].lat;
 								//res[i].lng = deviceResponse.data[k].lng;
-								//res[i].speed = deviceResponse.data[k].speed;
+								res[i].speed = deviceResponse.data[k].speed;
 								//res[i].course = deviceResponse.data[k].course;
 								//res[i].location_time = deviceResponse.data[k].location_time;
 								res[i].datetime = deviceResponse.data[k].location_time;
-								//res[i].positioning_time = deviceResponse.data[k].positioning_time;
+								res[i].positioning_time = deviceResponse.data[k].positioning_time;
 								//res[i].acc_high = deviceResponse.data[k].acc_high;
 								//res[i].on_trip = deviceResponse.data[k].on_trip;
 								//res[i].ac_on = deviceResponse.data[k].ac_on;
@@ -1547,6 +1548,7 @@ exports.getGpsGaadiForTripBasedGps = function (request, callback) {
 									res[i].status = 'online';
 								}
 								*/
+								otherUtils.setStatus(res[i]);
 							}
 						}
 					}

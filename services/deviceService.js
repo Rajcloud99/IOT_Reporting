@@ -709,6 +709,14 @@ function clubDrivesAndStops(device, callback) {
 
 		device.data[i - 2].duration = parseInt((new Date(device.data[i].end_time).getTime() - new Date(device.data[i - 2].start_time).getTime()) / 1000);
 		device.data[i - 2].distance += device.data[i].distance;
+		//copy points from removable ADAS to prev ADAS
+		if(device.data[i-2].points && device.data[i-2].points.length){
+			if(device.data[i].points && device.data[i].points.length){
+				device.data[i-2].points = device.data[i-2].points.concat(device.data[i].points);
+			}
+		}else if(device.data[i].points && device.data[i].points.length){
+			device.data[i-2].points = device.data[i].points;
+		}
 		device.data.splice(i - 1, 2);
 		i--;
 	}
@@ -3523,6 +3531,10 @@ exports.processRawDataForIdling = function(data,callback) {
 		duration = data[i].datetime - data[i-1].datetime;//msec
 		duration = duration/1000; //sec
 
+		if(duration>600){//ignore idling between offline durations ore than 10 min
+			continue;
+		}
+
 		if(i==1){
 			oAdas.start_time = data[i-1].datetime;
 			if(data[0].ignition == 0){
@@ -3686,10 +3698,8 @@ function checkIdlingFromADAS(das,oSettings = {}){
 		if (das[j].drive == false && das[j].points && das[j].points.length) {
 			let aIdling = exports.processRawDataForIdling(das[j].points);
 			let cIdle = 1;
-			let oStoppage = Object.assign({},das[j]);//copy object to prevent ref updating
-			delete oStoppage.points;
 			for (let i = 0; i < aIdling.length; i++) {
-				if (i == 0 && aIdling[i].duration > 60) {
+				if (i == 0 && aIdling[i].duration > 120) {
 					if(aIdling[i].idle){
 						if(aIdling[i].duration > 1000){
 							console.log('Idling greater than 16 min ',aIdling[i].start_time, aIdling[i].end_time);
@@ -3702,8 +3712,10 @@ function checkIdlingFromADAS(das,oSettings = {}){
 					}else{
 						das[j].idle = aIdling[i].idle;
 					}	
-				}else if(i > 0 && aIdling[i].duration > 60){
-					oStoppage.strat_time = aIdling[i].start_time;
+				}else if(i > 0 && aIdling[i].duration > 120){
+					let oStoppage = Object.assign({},das[j]);//copy object to prevent ref updating
+					delete oStoppage.points;
+					oStoppage.start_time = aIdling[i].start_time;
 					oStoppage.end_time = aIdling[i].end_time;
 					oStoppage.idle = aIdling[i].idle;
 					oStoppage.duration = aIdling[i].duration;
