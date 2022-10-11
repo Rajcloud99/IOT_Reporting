@@ -69,4 +69,15 @@ router.post("/getAllSubUser", function (req, res, next) {
 	}).catch(next);
 });
 
+router.post("/getUser", function (req, res, next) {
+	let user = req.body.user_id;
+	User.getUserAsync(user).then(function(oUser){
+		if(oUser){
+			return res.status(200).json({"status": "OK","message": "User Data found","data":oUser});
+		}else{
+			return res.status(200).json({"status": "ERROR","message": "Either user_id,user token  are wrong incorrect"});
+		}
+	}).catch(next);
+});
+
 module.exports = router;

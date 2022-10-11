@@ -455,7 +455,8 @@ router.post("/playback", function (req, res, next) {
             });
         */
     } else  {
-        request.idling = request.idling || false;
+       // request.idling = request.idling || false;
+        request.idling = false;
         deviceService.getPlaybackV4Async(request)
             .then(resp => {
                 response = resp;

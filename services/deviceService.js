@@ -2898,6 +2898,7 @@ exports.processRawData = function (imei, data, callback) {
 			//TODO check prev points
 			//TODO check next points
 		}
+
 		if (!oAdas.stop && distance < 300) {
 			oAdas.stop = {
 				latitude: data[i].latitude,
@@ -2912,6 +2913,7 @@ exports.processRawData = function (imei, data, callback) {
 		}
 
 		if (duration > 400 && oAdas.start) {
+			//2 coordinates more than 6 min duration
 			if (!oAdas.stop && oAdas.duration < 200) {
 				drive = false;
 				oAdas = { distance: 0, duration: 10, drive: false, nSkip: 0, top_speed: 0 };
@@ -2956,6 +2958,7 @@ exports.processRawData = function (imei, data, callback) {
 			}
 			continue;
 		}
+		//if coordinates duration less than 400 sec or  6 min
 		oAdas.stop = {
 			latitude: data[i].latitude,
 			longitude: data[i].longitude
@@ -3038,8 +3041,8 @@ exports.processRawData = function (imei, data, callback) {
 				oAdas.end_time = data[i].datetime;
 			}
 		} else if ((data[i].speed == 0 && data[i - 1].speed == 0)) {
-			if (oAdas.drive == false && oAdas.nSkip > 0) {
-				drive = true;
+			if (oAdas.drive == true && oAdas.nSkip > 0) {
+				drive = false;
 				oAdas.duration = (oAdas.end_time - oAdas.start_time) / 1000;
 				//start check drive and false
 				let spd = oAdas.distance / oAdas.duration * 3.6;
@@ -3699,10 +3702,14 @@ function checkIdlingFromADAS(das,oSettings = {}){
 			let aIdling = exports.processRawDataForIdling(das[j].points);
 			let cIdle = 1;
 			for (let i = 0; i < aIdling.length; i++) {
-				if (i == 0 && aIdling[i].duration > 120) {
+				if(aIdling[i].duration > 15 * 60){
+					continue;
+				}
+				aIdling[i].duration
+				if (i == 0 && aIdling[i].duration > 180) {
 					if(aIdling[i].idle){
 						if(aIdling[i].duration > 1000){
-							console.log('Idling greater than 16 min ',aIdling[i].start_time, aIdling[i].end_time);
+							//console.log('Idling greater than 16 min ',aIdling[i].start_time, aIdling[i].end_time);
 						}		
 						das[j].start_time = aIdling[i].start_time;
 					    das[j].end_time = aIdling[i].end_time;
@@ -3712,7 +3719,7 @@ function checkIdlingFromADAS(das,oSettings = {}){
 					}else{
 						das[j].idle = aIdling[i].idle;
 					}	
-				}else if(i > 0 && aIdling[i].duration > 120){
+				}else if(i > 0 && aIdling[i].duration > 180){
 					let oStoppage = Object.assign({},das[j]);//copy object to prevent ref updating
 					delete oStoppage.points;
 					oStoppage.start_time = aIdling[i].start_time;

@@ -339,9 +339,7 @@ function calculateSpeedFromRaw(data, request) {
         if (bNeedForSpped && data[i].speed > 0) bNeedForSpped = false;
         duration = data[i].datetime - data[i - 1].datetime;//msec
         duration = duration / 1000; //sec
-        if(data[i].speed > 65){
-            //console.log(data[i].speed);
-        }
+
         if (data[i - 1].latitude && data[i - 1].longitude && data[i].latitude && data[i].longitude) {
             distance = geozoneCalculator.getDistance({
                 latitude: data[i - 1].latitude,
