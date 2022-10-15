@@ -428,7 +428,7 @@ User.getUserById = function (request, callback) {
 		prepare: 1
 	};
 	const aParams = [prepareString(request.subUser)];
-	let query = "SELECT mobile,type, user_id ,email,name, total_device,stock FROM " + database.table_users +  " WHERE user_id IN ("+aParams+")";
+	let query = "SELECT mobile,type, user_id ,email,name, total_device,stock , password FROM  " + database.table_users +  " WHERE user_id IN ("+aParams+")";
 	cassandraDbInstance.execute(query,oConfig, function (err, result) {
 		if (err) {
 			winston.error('User.getUserById', err);

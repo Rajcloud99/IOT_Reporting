@@ -180,55 +180,73 @@ Device.getDevices = function (request, callback) {
 
 Device.associateDeviceWithUser = function (request, callback) {
 	const aQueries = [];
-	const updateDeviceInventoryQuery = 'UPDATE ' + database.table_device_inventory + ' SET user_id = ?, pooled = ? WHERE imei = ?';
+	const aParam = [];
 	for (let dev = 0; dev < request.devices.length; dev++) {
-		aQueries.push({
-			query: updateDeviceInventoryQuery,
-			params: [request.new_uid, request.pooled, parseInt(request.devices[dev])]
-		});
+		aParam.push(parseInt(request.devices[dev]), request.new_uid)
 	}
-	cassandraDbInstance.batch(aQueries, {prepare: true}, function (err, result) {
+	const getDeviceInventoryQuery = 'SELECT * FROM ' + database.table_device_inventory + ' WHERE imei = ' + aParam[0] +  ' AND user_id =' +  "'" + request.new_uid + "'";
+	cassandraDbInstance.execute(getDeviceInventoryQuery, [], function (err, result) {
 		if (err) {
 			winston.error('Device.associateDeviceWithUser', err);
 			return callback(err, null);
 		}
-		if (!result) {
-			winston.error('Device.associateDeviceWithUser no result');
-			return callback(err, null);
+		if (result && result.rows && result.rows.length > 0) {
+			winston.error('Device already assosiate with user');
+			return callback(err,null);
 		}
-		User.getUser(request.new_uid, function (err, res) {
-			const response = {status: 'ERROR', message: ""};
-			if (err) {
-				response.message = err.toString();
-			} else if (!res) {
-				response.message = 'user not found';
-			}else{
-				let userData = res;
-				let totalDevice = (userData.total_device || 0) + 1;
-				let totalStock = (userData.stock || 0) + 1;
-				const aParam = [];
-				aParam.push(request.new_uid);
-				const query1 = 'UPDATE ' + database.table_users + ' SET total_device = ' + totalDevice + ', stock =  ' +  totalStock + ' WHERE user_id = ?';
-				cassandraDbInstance.execute(query1, aParam, {prepare: true});
+		if(result && result.rows && result.rows.length === 0){
+			const updateDeviceInventoryQuery = 'UPDATE ' + database.table_device_inventory + ' SET user_id = ?, pooled = ? WHERE imei = ?';
+			for (let dev = 0; dev < request.devices.length; dev++) {
+				aQueries.push({
+					query: updateDeviceInventoryQuery,
+					params: [request.new_uid, request.pooled, parseInt(request.devices[dev])]
+				});
 			}
-		});
-		User.getUser(request.selected_uid, function (err, res) {
-			const response = {status: 'ERROR', message: ""};
-			if (err) {
-				response.message = err.toString();
-			} else if (!res) {
-				response.message = 'user not found';
-			}else{
-				let userData = res;
-				let totalStock = (userData.stock || 0) - 1;
-				const aParam = [];
-				aParam.push(request.selected_uid);
-				const query1 = 'UPDATE ' + database.table_users + ' SET stock = ' + totalStock +  ' WHERE user_id = ?';
-				cassandraDbInstance.execute(query1, aParam, {prepare: true});
-			}
-		});
-		return callback(err, result);
+			cassandraDbInstance.batch(aQueries, {prepare: true}, function (err, result) {
+				if (err) {
+					winston.error('Device.associateDeviceWithUser', err);
+					return callback(err, null);
+				}
+				if (!result) {
+					winston.error('Device.associateDeviceWithUser no result');
+					return callback(err, null);
+				}
+				User.getUser(request.new_uid, function (err, res) {
+					const response = {status: 'ERROR', message: ""};
+					if (err) {
+						response.message = err.toString();
+					} else if (!res) {
+						response.message = 'user not found';
+					}else{
+						let userData = res;
+						let totalDevice = (userData.total_device || 0) + 1;
+						let totalStock = (userData.stock || 0) + 1;
+						const aParam = [];
+						aParam.push(request.new_uid);
+						const query1 = 'UPDATE ' + database.table_users + ' SET total_device = ' + totalDevice + ', stock =  ' +  totalStock + ' WHERE user_id = ?';
+						cassandraDbInstance.execute(query1, aParam, {prepare: true});
+					}
+				});
+				User.getUser(request.selected_uid, function (err, res) {
+					const response = {status: 'ERROR', message: ""};
+					if (err) {
+						response.message = err.toString();
+					} else if (!res) {
+						response.message = 'user not found';
+					}else{
+						let userData = res;
+						let totalStock = (userData.stock || 0) - 1;
+						const aParam = [];
+						aParam.push(request.selected_uid);
+						const query1 = 'UPDATE ' + database.table_users + ' SET stock = ' + totalStock +  ' WHERE user_id = ?';
+						cassandraDbInstance.execute(query1, aParam, {prepare: true});
+					}
+				});
+				return callback(err, result);
+			});
+		}
 	});
+
 };
 
 Device.registerDevice = function (device, callback) {
@@ -649,6 +667,28 @@ Device.fetchDeviceById = async function (userId , callback) {
 		}
 	});
 };
+
+Device.fetchDeviceByUserId = async function (userId , callback) {
+	const query = 'SELECT * FROM ' + database.table_device_inventory + " WHERE user_id = "+userId+"";
+	cassandraDbInstance.execute(query,[], function (err, result) {
+		if (err) {
+			winston.error('User.getAllUsers', err);
+			callback(err);
+			return;
+		}
+		if (result && result.rows && result.rows.length === 0) {
+			callback(null, []);
+			return;
+		}
+		if (result && result.rows) {
+			for (const key in result.rows) {
+				result.rows[key] = new Device(result.rows[key]);
+			}
+			callback(err, result.rows);
+		}
+	});
+};
+
 
 
 

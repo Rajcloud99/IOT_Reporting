@@ -358,6 +358,16 @@ router.post('/update_device', function (req, res) {
         });
 });
 
+router.post("/getDeviceByUser", function (req, res, next) {
+    let user = "'" + req.body.user_id + "'";
+    Device.fetchDeviceByUserIdAsync(user).then(function(oUser){
+        if(oUser){
+            return res.status(200).json({"status": "OK","message": "Device Data found","data":oUser});
+        }else{
+            return res.status(200).json({"status": "ERROR","message": "Either user_id,user token  are wrong incorrect"});
+        }
+    }).catch(next);
+});
 function timeGapCalculate(data, time) {
     let arr = [];
     // sort the data first

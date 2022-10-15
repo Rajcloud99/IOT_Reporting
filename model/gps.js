@@ -140,7 +140,7 @@ Gps.getGPSDataBetweenTime = function (deviceid, starttime, endtime, callback) {
         if (result.nextPage) {
             result.nextPage();
         } else {
-            calculateSpeedFromRaw(gpsData);
+           // calculateSpeedFromRaw(gpsData);
             callback(err, gpsData);
         }
     });

@@ -107,7 +107,7 @@ exports.associateDeviceWithUser = function (request, callback) {
 				if (err) {
 					response.message = err.toString();
 				} else if (!res) {
-					response.message = 'device update registration failed';
+					response.message = `device already allocate to ${request.new_uid} you can not allocate again to same account`;
 				} else {
 					response.status = 'OK';
 					response.message = 'Device update done succefully';
@@ -2844,6 +2844,9 @@ exports.processRawData = function (imei, data, callback) {
 			latitude: data[i].latitude,
 			longitude: data[i].longitude
 		});
+		if(distance > 1000){
+			console.log('distance more',distance);
+		}
 		let eSpeed = distance/duration * 3.6;
 		if(false && duration < 300 && eSpeed > 80){
 			//case 1 if i=1 check if first point is wrong

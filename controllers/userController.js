@@ -8,8 +8,17 @@ const User = BPromise.promisifyAll(require('../model/user'));
 const userService = require('../services/userService');
 const authUtil = require('../utils/authUtil');
 const excelService = require("../services/excelService");
+const crypto = require("crypto");
 const router = require('express').Router();
 const externalip = require('../config').externalip;
+const algorithm = 'aes192';
+const PasswordSecretKey = 'Ash123';
+let encrypt = function (value) {
+	let cipher = crypto.createCipher(algorithm, PasswordSecretKey);
+	let crypted = cipher.update(value, 'utf8', 'hex');
+	crypted += cipher.final('hex');
+	return crypted;
+};
 
 router.post("/getKey", function (req, res, next) {
 	User.getUserAsync(req.body.user_id)
@@ -58,6 +67,9 @@ router.post("/getAllSubUser", function (req, res, next) {
 							return res.status(200).json({"status": "OK","message": "User Data found","data":obj.url});
 						});
 					}else{
+						for(const d of resp){
+							d.password = encrypt(d.password);
+						}
 						return res.status(200).json({"status": "OK","message": "User Data found","data":resp});
 					}
 				}
