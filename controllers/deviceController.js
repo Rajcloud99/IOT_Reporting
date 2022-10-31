@@ -368,6 +368,18 @@ router.post("/getDeviceByUser", function (req, res, next) {
         }
     }).catch(next);
 });
+
+router.post("/removeDeviceFromUser", function (req, res, next) {
+    Device.removeDevicesForUserIdAsync(req.body).then(function(oUser){
+        if(oUser){
+            return res.status(200).json({"status": "OK","message": "Device Removed Successfully","data":oUser});
+        }else{
+            return res.status(200).json({"status": "ERROR","message": "Either user_id,user token  are wrong incorrect"});
+        }
+    }).catch(next);
+});
+
+
 function timeGapCalculate(data, time) {
     let arr = [];
     // sort the data first

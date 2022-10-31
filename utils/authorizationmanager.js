@@ -121,6 +121,7 @@ class AuthorizationManager {
 			case requests.download_report_parking:
 			case requests.report_mileage:
 			case requests.download_report_mileage:
+			case requests.get_geozone_download:
 			case requests.report_mileage2:
 			case requests.download_report_mileage2:
 			case requests.report_overspeed:

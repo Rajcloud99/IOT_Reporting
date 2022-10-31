@@ -1168,6 +1168,25 @@ exports.getTrackingSheetReport = function (data, callback) {
     }
     saveFileAndReturnCallback(workbook, data.misType || "miscellaneous", data.selected_uid || data.login_uid, new Date().getTime(), 'tracking_sheet', 'tracking-sheet', callback);
 };
+
+exports.getGeozoneSheetReport = function (data, callback) {
+    let timezone = "Asia/Calcutta";//moment.tz.guess();
+    if (data.timezone) timezone = data.timezone;
+    const workbook = new Excel.Workbook();
+    const ws = workbook.addWorksheet('Geozone Sheet');
+    formatTitle(ws, 6, 'Geozone Sheet');
+    ws.mergeCells('A2:C2');
+    ws.getCell('A2').value = 'Date: ' + dateutils.getDDMMYYYY();
+    formatColumnHeaders(ws, 3, ['Name', 'Latitude', 'Longitude','Create Time'], [10, 15, 15]);
+
+    for (let i = 0; i < data.data.length; i++) {
+        ws.getCell('A' + (i + 4)).value = data.data[i].name || 'NA';
+        ws.getCell('B' + (i + 4)).value =  data.data[i].geozone && data.data[i].geozone[0] && data.data[i].geozone[0].latitude || 'NA';
+        ws.getCell('C' + (i + 4)).value = data.data[i].geozone && data.data[i].geozone[0] && data.data[i].geozone[0].longitude || 'NA';
+        ws.getCell('D' + (i + 4)).value = dateutils.getFormattedDateTimeByZone(data.data[i].datetime, timezone) || 'NA';
+    }
+    saveFileAndReturnCallback(workbook, data.misType || "miscellaneous", data.selected_uid || data.login_uid, new Date().getTime(), 'geozone_sheet', 'geozone-sheet', callback);
+};
 exports.getGeofenceNotificationReport = function (data, callback) {
     let timezone = "Asia/Calcutta";//moment.tz.guess();
     if (data.timezone) timezone = data.timezone;

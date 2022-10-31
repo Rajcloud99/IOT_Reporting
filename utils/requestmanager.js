@@ -13,6 +13,7 @@ const gpsgaadiService = BPromise.promisifyAll(require('../services/gpsgaadiServi
 const landmarkService = BPromise.promisifyAll(require('../services/landmarkService'));
 const featureService = BPromise.promisifyAll(require('../services/featureService'));
 const excelService = require('../services/excelService');
+const tripService = require('../services/tripService');
 const shared_locationsService = require('../services/shared_locationsService');
 const mDeviceService = require('../services/mobileDeviceService');
 const NotifPrefs = require('../services/notifPrefService');
@@ -777,6 +778,20 @@ class RequestManager {
 				// winston.info(request);
 				return geozoneService.getGeozone(request, response => {
 					this.callback(request, response);
+				});
+			case requests.get_geozone_download:
+				// winston.info(request);
+				return geozoneService.getGeozone(request, response => {
+					if (response.status === 'ERROR') {
+						return this.callback(request, response);
+					}
+					response.login_uid = request.login_uid;
+					response.timezone = request.timezone;
+					excelService.getGeozoneSheetReport(response, obj => {
+						response.data = obj.url;
+						response.message = "Geozone sheet generated successfully";
+						this.callback(request, response);
+					});
 				});
 			// break;
 			case requests.update_geozone:

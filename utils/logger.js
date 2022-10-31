@@ -1,4 +1,4 @@
-/*
+
 const winston = require('winston');
 winston.emitErrs = true;
 const logger = new (winston.Logger)({
@@ -27,7 +27,7 @@ const logger = new (winston.Logger)({
 	exitOnError: false
 });
 module.exports = logger;
-*/
+/*
 
 const winston = require('winston');
  
@@ -46,7 +46,7 @@ const logger = winston.createLogger({
   ],
 });
 module.exports = logger;
-
+*/
 //
 // If we're not in production then log to the `console` with the format:
 // `${info.level}: ${info.message} JSON.stringify({ ...rest }) `

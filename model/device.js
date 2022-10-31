@@ -313,9 +313,8 @@ Device.registerDevicesBatch = function (deviceArr, callback) {
 
 Device.removeDevicesForUserId = function (request, callback) {
     request.selected_uid = request.selected_uid || request.login_uid;
-    const query = 'DELETE FROM ' + database.table_gpsgaadi + ' WHERE user_id = ?';
-
-    cassandraDbInstance.execute(query, [request.selected_uid], {
+    const query = 'DELETE user_id FROM ' + database.table_device_inventory + ' WHERE imei = ' + parseInt(request.imei);
+    cassandraDbInstance.execute(query, [], {
         prepare: true
     }, function (err, result) {
         if (err) {
@@ -535,7 +534,7 @@ Device.getDeviceList = function (request, callback) {
 		oConfig.fetchSize = 30;
 	}
 
-	let query = 'SELECT imei,reg_no,user_id,name,device_type,sim_no,status,location_time, positioning_time, lat,lng,speed FROM ' + database.table_device_inventory;
+	let query = 'SELECT imei,reg_no,user_id,name,device_type,sim_no,status,location_time, positioning_time, lat,lng,speed,ip FROM ' + database.table_device_inventory;
 	const aParams = [];
 	const aQParam = [];
 	/***If imei list is not provided ***/

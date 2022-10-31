@@ -8,16 +8,14 @@ const User = BPromise.promisifyAll(require('../model/user'));
 const userService = require('../services/userService');
 const authUtil = require('../utils/authUtil');
 const excelService = require("../services/excelService");
-const crypto = require("crypto");
 const router = require('express').Router();
 const externalip = require('../config').externalip;
-const algorithm = 'aes192';
-const PasswordSecretKey = 'Ash123';
+const CryptoJS = require("crypto-js")
+const key = 'Ash123';
 let encrypt = function (value) {
-	let cipher = crypto.createCipher(algorithm, PasswordSecretKey);
-	let crypted = cipher.update(value, 'utf8', 'hex');
-	crypted += cipher.final('hex');
-	return crypted;
+	var cipher = CryptoJS.AES.encrypt(value, key);
+	cipher = cipher.toString();
+	return cipher;
 };
 
 router.post("/getKey", function (req, res, next) {

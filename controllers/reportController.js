@@ -133,6 +133,41 @@ router.post("/km", function (req, res, next) {
     });
 });
 
+//for show data on UI
+router.post("/kmV2", function (req, res, next) {
+    let request = req.body;
+    let stdt = new Date();
+    let min;
+    console.log('start time ', new Date());
+    if (request.device_id instanceof Array) {
+        let tempD = [];
+        for (let k = 0; k < request.device_id.length; k++) {//remove null imeis
+            if (request.device_id[k] && request.device_id[k].toString().length < 16) {
+                tempD.push(request.device_id[k]);
+            }
+        }
+        request.device_id = tempD;
+    }
+    // winston.info(request);
+    request.start_time = new Date(request.start_time).getTime();
+    request.end_time = new Date(request.end_time).getTime();
+    // winston.info(request);
+
+    reportService.getMileageReport(request, (err, response) => {
+        if (!response || response.status === 'ERROR') {
+            return res.status(200).json(response);
+        }
+        response.device_id = request.device_id;
+        response.login_uid = request.login_uid;
+        response.start_time = request.start_time;
+        response.end_time = request.end_time;
+        response.timezone = request.timezone;
+
+        return res.status(200).json(response);
+
+    });
+});
+
 router.post("/mileage2", function (req, res, next) {
     let request = req.body;
     let stdt = new Date();
@@ -212,6 +247,45 @@ router.post("/kmLive", function (req, res, next) {
         }else{
             return res.status(200).json(response);
         }
+
+    });
+});
+
+//for show data on UI
+router.post("/kmLiveV2", function (req, res, next) {
+    let request = req.body;
+    if (!request.device_id) {
+        let resp = resquest;
+        resp.status = 'ERROR';
+        resp.message = 'device id not found';
+        return res.status(200).json(resp);
+    }
+    console.log('kmLive start time ', new Date());
+    if (request.device_id instanceof Array) {
+        let tempD = [];
+        for (let k = 0; k < request.device_id.length; k++) {//remove null imeis
+            if (request.device_id[k] && request.device_id[k].toString().length < 16) {
+                tempD.push(request.device_id[k]);
+            }
+        }
+        request.device_id = tempD;
+    }
+    request.start_time = new Date(request.start_time).getTime();
+    request.end_time = new Date(request.end_time).getTime();
+
+
+    deviceService.getMileageReport2(request.device_id, request.start_time, request.end_time, "download", (err, response) => {
+        response.device_id = request.device_id;
+        response.login_uid = request.login_uid;
+        response.start_time = request.start_time;
+        response.end_time = request.end_time;
+        if (response.status === 'ERROR') {
+            return res.status(200).json(response);
+        }
+        response.timezone = request.timezone;
+
+        return res.status(200).json(response);
+
 
     });
 });
@@ -1057,12 +1131,20 @@ router.post("/detailAnalysis", function (request, res) {
         .then(resp => {
             if(resp.data && Object.keys(resp.data)[0]){
                 let imei = Object.keys(resp.data)[0];
-                excelService.detailAnalysisRpt(resp.data[imei], obj => {
-                    return res.status(200).json({
-                        message: "Report Successfully Created",
-                        url: obj.url
+                if(request.body.download === true) {
+                    excelService.detailAnalysisRpt(resp.data[imei], obj => {
+                        return res.status(200).json({
+                            message: "Report Successfully Created",
+                            url: obj.url
+                        });
                     });
-                });
+                }else{
+                    return res.status(200).json({
+                        status: 'ok',
+                        message: "Report Successfully Generated",
+                        data: resp
+                    });
+                }
             }else{
                 return res.status(200).json({
                     message: "No data Found",
@@ -1109,6 +1191,13 @@ router.post("/devices", function (req, res, next) {
     }
     request.client = 'web';
     request.request = 'gpsgaadi_by_uid';
+    if(!request.selected_uid){
+        let response = {
+            status:'Error',
+            message:'GPS account Id not linked with LMS. Contact your admin'
+        }
+        return res.status(500).json(response);
+    }
     request.project = request.project || {device_type:1,imei:1}
     gpsgaadiService.getGpsGaadiForTripBasedGps(request, response => {
         //response = otherUtils.pruneEmpty(response);
@@ -1324,12 +1413,16 @@ router.post("/vehicle_summary", function (req, res) {
                 return res.status(200).json(response);
             }
            //return res.status(200).json(response);
+        if(request.download == true) {
             excelService.getVehicleSummaryReport(response, obj => {
                 min = new Date() - stdt;
                 console.log('report data resp  ', min / 60000);
                 response.data = obj.url;
                 return res.status(200).json(response);
             });
+        }else{
+            return res.status(200).json(response);
+        }
         })
 });
 
@@ -1388,13 +1481,18 @@ router.post("/idleSummary", function (req, res, next) {//new version
                 return res.status(200).json(response);
             }
            //return res.status(200).json(response);
+        if(request.download == true) {
             excelService.getVehicleIdleSummaryReport(response, obj => {
-              //  min = new Date() - stdt;
-               // console.log('report data resp  ', min / 60000);
+                //  min = new Date() - stdt;
+                // console.log('report data resp  ', min / 60000);
                 response.data = obj.url;
                 return res.status(200).json(response);
             });
+        }else{
+            return res.status(200).json(response);
+        }
         })
+
 });
 
 function fillAddressIfRequired(adas, callback) {

@@ -48,11 +48,16 @@ module.exports.downloadNotifications = function (request, callback) {
                     trimGeofences(response.data,request);
                 }
                 response.timezone = request.timezone;
-				excelService.getGeofenceNotificationReport(response, function (obj) {
-					response.message = 'link for geofence report';
-					response.data = obj.url;
-					return callback(response);
-				});
+                if(request.download == true) {
+                    excelService.getGeofenceNotificationReport(response, function (obj) {
+                        response.message = 'link for geofence report';
+                        response.data = obj.url;
+                        return callback(response);
+                    });
+                }else{
+                    response.message = 'entry exit report data';
+                    return callback(response);
+                }
 			} else if (request.type === 'halt') {
 				excelService.getHaltNotificationReport(response, function (obj) {
 					response.message = 'link for geofence report';

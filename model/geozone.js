@@ -41,7 +41,7 @@ Geozone.getGeozone = function (request, callback) {
 	if (request.row_count) {
 		oConfig.fetchSize = request.row_count;
 	} else { //default no of rows 30
-		oConfig.fetchSize = 100;
+		oConfig.fetchSize = 500;
 	}
 	request.selected_uid = request.selected_uid || request.login_uid;
 	let query, skey, aParam = [];

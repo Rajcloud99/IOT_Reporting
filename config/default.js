@@ -64,7 +64,6 @@ module.exports = {
 		"table_Alarm_schedule":"alarm_schedule",
 		"table_device_alerts":"device_alerts"
 	},
-
 	"commands": {
 		"location": {
 			"desc": "Get Location",
@@ -2094,6 +2093,7 @@ module.exports = {
 		live_feedV2:'live_feedV2',
 		stop_feed: 'stop_feed',
 		sub_users: 'sub_users',
+		get_user: 'get_user',
 		register_device: 'register_device',
 		device_by_imei: 'device_by_imei',
 		update_device: 'update_device',
@@ -2197,6 +2197,7 @@ module.exports = {
 		download_driver_day_activity:'download_driver_day_activity',
         vehicle_exceptions:'vehicle_exceptions',
         download_vehicle_exceptions:'download_vehicle_exceptions',
+		get_geozone_download:'get_geozone_download',
 		commands:"commands"
 
 	},

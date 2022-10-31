@@ -11,7 +11,7 @@ exports.getMileageReportLMS = function (request, callback) {
             return callback(response);
             //winston.error(err);
         } else if (!res || res.length === 0) {
-            response.message = 'location not found in DB for ' + imei;
+            response.message = 'location not found in DB for '+ request.device_id;
             return callback(response);
         } else {
             processMileageReportForLMS(request,res,callback);
