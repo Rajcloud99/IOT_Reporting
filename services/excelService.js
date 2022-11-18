@@ -588,7 +588,6 @@ exports.getActivityReport2 = function (data, callback) { //ritika raj
 
 };
 
-
 exports.getDriverActivityReport = function (data, callback) {
     let timezone = "Asia/Calcutta";//moment.tz.guess();
     if (data.timezone) timezone = data.timezone;

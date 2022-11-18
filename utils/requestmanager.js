@@ -1018,52 +1018,7 @@ class RequestManager {
 					this.callback(request, response);
 				});
 				break;
-			case requests.get_trips:
-				request.feature = 'trips';
-				return tripService.getTrip(request, response => {
-					this.callback(request, response);
-				});
-    		case requests.get_vehicle_trips:
-		        //console.log(request);
-        		request.feature = 'trips';
-        		return tripService.getTripForVehicle(request, response => {
-            	this.callback(request, response);
-				});
-			case requests.create_trip:
-				request.feature = 'trips';
-				return tripService.createTripWithAlarms(request, response => {
-					this.callback(request, response);
-				});
-			// break;
-			case requests.update_trip:
-				request.feature = 'trips';
-				return tripService.updateTrip(request, response => {
-					this.callback(request, response);
-				});
-			// break;
-			case requests.remove_trip:
-				request.feature = 'trips';
-				return tripService.removeTrip(request, response => {
-					this.callback(request, response);
-				});
-			// break;
-			case requests.download_report_trip:
-				tripService.getTrip(request, response => {
-					response.device_id = request.device_id;
-					response.login_uid = request.login_uid;
-					response.start_time = request.start_time;
-					response.end_time = request.end_time;
-                    response.timezone = request.timezone;
-					response.created_at = request.created_at || new Date();
-					if (response.status === 'ERROR') {
-						return this.callback(request, response);
-					}
-					excelService.getTripReport(response, obj => {
-						response.data = obj.url;
-						this.callback(request, response);
-					});
-				});
-				break;
+
 			case requests.share_location:
 				return shared_locationsService.createSharedLocation(request, response => {
 					this.callback(request, response);

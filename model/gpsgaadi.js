@@ -194,7 +194,7 @@ GpsGaadi.getFlvliList = function (request, callback) {
 	let aParams;
 
 	if (request.device_id) {
-		query = 'SELECT datetime,fl,f_lvl FROM ' + database.table_gps_data +  ' WHERE device_id IN(?) ' + ' AND  datetime >= ? AND datetime <=? ORDER BY datetime DESC LIMIT 8000 ALLOW FILTERING';
+		query = 'SELECT datetime,fl,f_lvl,speed,latitude,longitude FROM ' + database.table_gps_data +  ' WHERE device_id IN(?) ' + ' AND  datetime >= ? AND datetime <=? ORDER BY datetime DESC LIMIT 60000 ALLOW FILTERING';
 		aParams = [request.device_id.join(","),request.from,request.to];
 	}
 	if(!query){

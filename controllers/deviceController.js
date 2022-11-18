@@ -261,8 +261,12 @@ router.post('/get_deviceFlvl', function (req, res) {
     }
     let oReq = {};
     if(req.body.from && req.body.to){
-        oReq.from = req.body.from;
-        oReq.to = req.body.to;
+        let from = new Date(req.body.from);
+        let to = new Date(req.body.to);
+        from.setHours(0,0,0,0);
+        to.setHours(23,59,59,999);
+        oReq.from = from;
+        oReq.to = to;
     }
     if(req.body.device_id){
         if(req.body.device_id instanceof Array){
@@ -392,7 +396,7 @@ function timeGapCalculate(data, time) {
         stGetTime = data[i].datetime.getTime();
         for (let j = i +1 ; j < data.length; j++) {
            endGetTime = data[j].datetime.getTime();
-           if((endGetTime - stGetTime) > gap){
+           if((endGetTime - stGetTime) > gap && data[j].f_lvl > 0){
                arr.push(data[j]);
                i = j;
                break;

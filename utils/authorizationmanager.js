@@ -188,18 +188,12 @@ class AuthorizationManager {
 			case requests.gpsgaadi_by_uid:
 			case requests.get_devide_types:
 			case requests.gpsgaadi_by_reg_no:
-			case requests.download_report_trip:
-			case requests.get_trips:
-            case requests.get_vehicle_trips:
 			case requests.device_by_imei:
 			case requests.add_vehicle:
 			case requests.add_imei:
 			case requests.change_password:
 			case requests.update_user:
 			case requests.remove_sub_user:
-			case requests.create_trip:
-			case requests.update_trip:
-			case requests.remove_trip:
 			case requests.get_device_config:
 			case requests.get_device_info:
 			case requests.gpsgaadi_by_uid_list:
