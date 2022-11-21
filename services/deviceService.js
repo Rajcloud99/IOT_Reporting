@@ -1208,6 +1208,7 @@ function processADASReportForPlayBack(data,options, callback) {
             device.dur_wo_stop = dur_total - dur_stop;
             device.engine_hours = dur_total - dur_stop + device.dur_idle;
         }).then(function () {
+			console.log('options.isAddrReqd',options.isAddrReqd);
 			if (options && options.isAddrReqd){
 				return BPromise.promisify(fillAddressIfRequired)(device);
 			}
@@ -3223,6 +3224,7 @@ exports.getPlaybackV4 = function (request, callback) {
     }).error(function (err) {
         console.log('err'+err.toString());
     }).then(function () {
+		console.log('request.isAddrReqd',request.isAddrReqd , request.isAddrReqd == false);
 		if(request.isAddrReqd == false){
 			request.isAddrReqd = false;
 		}else{
