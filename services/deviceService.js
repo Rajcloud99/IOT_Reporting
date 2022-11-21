@@ -1118,7 +1118,6 @@ function processADASReportForPlayBack(data,options, callback) {
 
     let devices = {};
 	let allDevices = activeusersmanager.getAllDevices();
-	console.log('log level -1');
     for (let i = 0; i < data.length; i++) {
         data[i].imei = parseInt(data[i].imei);
         if (!devices[data[i].imei]) {
@@ -1142,7 +1141,7 @@ function processADASReportForPlayBack(data,options, callback) {
             if (keyA > keyB) return 1;
             return 0;
         });
-		console.log('log level 0');
+
 		BPromise.promisify(predictOfflineDistance)(device.data)
 			.then(function () {
 				return BPromise.promisify(combineADASData)(device);
@@ -1151,7 +1150,6 @@ function processADASReportForPlayBack(data,options, callback) {
 		    }).then(function () {
 			   return BPromise.promisify(combineADASData)(device);
 		    }).then(function () {
-			console.log('log level 1');
             for (let i = 0; i < device.data.length; i++) {
 				if(options.haltDuration && !device.data[i].drive && (device.data[i].duration < options.haltDuration)){
 					device.data.splice(i,1);
@@ -1210,7 +1208,6 @@ function processADASReportForPlayBack(data,options, callback) {
             device.dur_wo_stop = dur_total - dur_stop;
             device.engine_hours = dur_total - dur_stop + device.dur_idle;
         }).then(function () {
-			console.log('log level 2',options.isAddrReqd);
 			if (options && options.isAddrReqd){
 				return BPromise.promisify(fillAddressIfRequired)(device);
 			}
@@ -3226,8 +3223,12 @@ exports.getPlaybackV4 = function (request, callback) {
     }).error(function (err) {
         console.log('err'+err.toString());
     }).then(function () {
-		request.isAddrReqd = true;
-		console.log('before processADASReportForPlayBack',request.device_id,adas.length);
+		if(request.isAddrReqd == false){
+			request.isAddrReqd = false;
+		}else{
+			request.isAddrReqd = true;
+		}
+
         return BPromise.promisify(processADASReportForPlayBack)(adas, request);
 	}).then(function(response){
         activity.data = response;
@@ -3324,7 +3325,6 @@ exports.getPlaybackV4 = function (request, callback) {
             activity.data[i].points[activity.data[i].points.length - 1].cum_dist = activity.tot_dist;
             break;
         }
-		console.log('before getPlaybackV4 callback',request.device_id,new Date());
         callback(null, activity);
     });
 };
