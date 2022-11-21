@@ -496,8 +496,7 @@ router.post("/playback", function (req, res, next) {
     let request = req.body;
     let stdt = new Date();
     let min;
-    console.log('playback start time ', new Date());
-
+    console.log('playback start time ',request.device_id);
     if (request.device_id instanceof Array) {
         let tempD = [];
         for (let k = 0; k < request.device_id.length; k++) {//remove null imeis

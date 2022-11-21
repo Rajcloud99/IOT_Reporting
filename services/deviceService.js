@@ -2845,7 +2845,7 @@ exports.processRawData = function (imei, data, callback) {
 			longitude: data[i].longitude
 		});
 		if(distance > 1000){
-			console.log('distance more',distance);
+			//console.log('distance more',distance);
 		}
 		let eSpeed = distance/duration * 3.6;
 		if(false && duration < 300 && eSpeed > 80){
@@ -3224,6 +3224,7 @@ exports.getPlaybackV4 = function (request, callback) {
         console.log('err'+err.toString());
     }).then(function () {
 		request.isAddrReqd = true;
+		console.log('before processADASReportForPlayBack',request.device_id,new Date());
         return BPromise.promisify(processADASReportForPlayBack)(adas, request);
 	}).then(function(response){
         activity.data = response;
@@ -3320,6 +3321,7 @@ exports.getPlaybackV4 = function (request, callback) {
             activity.data[i].points[activity.data[i].points.length - 1].cum_dist = activity.tot_dist;
             break;
         }
+		console.log('before getPlaybackV4 callback',request.device_id,new Date());
         callback(null, activity);
     });
 };
