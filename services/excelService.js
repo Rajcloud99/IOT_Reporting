@@ -101,11 +101,12 @@ exports.getParkingReport = function (data, callback) {
         }
 
         mergeCells(ws, 8, 8);
-        if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
-            ws.getCell('A3').value = 'Reg No : ' + activeusersmanager.getDeviceWithIMEI(key).reg_no
-        } else {
-            ws.getCell('A3').value = 'Reg No : ' + key;
-        }
+        // if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
+        //     ws.getCell('A3').value = 'Reg No : ' + activeusersmanager.getDeviceWithIMEI(key).reg_no
+        // } else {
+        //     ws.getCell('A3').value = 'Reg No : ' + key;
+        // }
+        ws.getCell('A3').value = 'Reg No : ' + data.reg_no;
         ws.getCell('E2').value = 'From : ' + dateutils.getDDMMYYYY(data.start_time);
         ws.getCell('E3').value = 'To : ' + dateutils.getDDMMYYYY(data.end_time);
 
@@ -147,7 +148,6 @@ exports.getParkingReportWCPL = function (data, callback) {
     let timezone = "Asia/Calcutta";//moment.tz.guess();
     if (data.timezone) timezone = data.timezone;
     const workbook = new Excel.Workbook();
-
     for (const key in data.data) {
         const device = data.data[key];
 
@@ -168,11 +168,12 @@ exports.getParkingReportWCPL = function (data, callback) {
         }
 
         mergeCells(ws, 8, 8);
-        if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
-            ws.getCell('A3').value = 'Reg No : ' + activeusersmanager.getDeviceWithIMEI(key).reg_no
-        } else {
-            ws.getCell('A3').value = 'Reg No : ' + key;
-        }
+        // if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
+        //     ws.getCell('A3').value = 'Reg No : ' + activeusersmanager.getDeviceWithIMEI(key).reg_no
+        // } else {
+        //     ws.getCell('A3').value = 'Reg No : ' + key;
+        // }
+        ws.getCell('A3').value = 'Reg No : ' + data.reg_no;
         ws.getCell('E2').value = 'From : ' + dateutils.getDDMMYYYY(data.start_time);
         ws.getCell('E3').value = 'To : ' + dateutils.getDDMMYYYY(data.end_time);
 

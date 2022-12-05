@@ -242,7 +242,7 @@ User.updateUser = function (request, callback) {
 	}, function (err, result) {
 		if (err) {
 			callback(err, null);
-			winston.error('User.updateUser', err);
+			winston.error('User.updateUser', sQuery,err);
 			return;
 		}
 		if (!result) {
