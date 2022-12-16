@@ -75,6 +75,7 @@ router.post("/overspeed", function (req, res, next) {
     }
     deviceService.getOverspeedReport(request.device_id, request.start_time, request.end_time, request.speed_limit, "web", response => {
         response.device_id = request.device_id;
+        response.reg_no = request.regVeh && request.regVeh[0] && request.regVeh[0].reg_no;
         response.login_uid = request.login_uid;
         response.start_time = request.start_time;
         response.end_time = request.end_time;
@@ -118,6 +119,7 @@ router.post("/km", function (req, res, next) {
             return res.status(200).json(response);
         }
         response.device_id = request.device_id;
+        response.reg_no = request.regVeh && request.regVeh[0] && request.regVeh[0].reg_no;
         response.login_uid = request.login_uid;
         response.start_time = request.start_time;
         response.end_time = request.end_time;
@@ -496,7 +498,8 @@ router.post("/playback", function (req, res, next) {
     let request = req.body;
     let stdt = new Date();
     let min;
-    console.log('playback start time ',request.device_id);
+    console.log('playback start time ', new Date());
+
     if (request.device_id instanceof Array) {
         let tempD = [];
         for (let k = 0; k < request.device_id.length; k++) {//remove null imeis
@@ -936,6 +939,7 @@ router.post("/driver_activity", function (req, res, next) {//new version
         deviceService.getPlaybackV4DriverReportAsync(request)
             .then(resp => {
                 response = resp;
+                response.reg_no = request.regVeh && request.regVeh[0] && request.regVeh[0].reg_no;
                 response.device_id = request.device_id;
                 response.login_uid = request.login_uid;
                 response.start_time = request.start_time;

@@ -403,16 +403,18 @@ exports.getActivityReport = function (data, callback) {
             ws.mergeCells('F' + i + ':H' + i);
         }
 
-        if (device.reg_no) {
-            ws.getCell('A3').value = 'Reg No : ' + device.reg_no;
-            data.reportName = device.reg_no + "_Activity";
-        } else if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
-            ws.getCell('A3').value = 'Reg No : ' + activeusersmanager.getDeviceWithIMEI(key).reg_no;
-            data.reportName = activeusersmanager.getDeviceWithIMEI(key).reg_no + "_Activity";
-        } else {
-            ws.getCell('A3').value = 'Reg No : ' + key;
-            data.reportName = key + "_Activity";
-        }
+        // if (device.reg_no) {
+        //     ws.getCell('A3').value = 'Reg No : ' + device.reg_no;
+        //     data.reportName = device.reg_no + "_Activity";
+        // } else if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
+        //     ws.getCell('A3').value = 'Reg No : ' + activeusersmanager.getDeviceWithIMEI(key).reg_no;
+        //     data.reportName = activeusersmanager.getDeviceWithIMEI(key).reg_no + "_Activity";
+        // } else {
+        //     ws.getCell('A3').value = 'Reg No : ' + key;
+        //     data.reportName = key + "_Activity";
+        // }
+        ws.getCell('A3').value = 'Reg No : ' + data.reg_no;
+        data.reportName = data.reg_no + "_Activity";
         ws.getCell('F2').value = 'From : ' + dateutils.getDDMMYYYY(data.start_time instanceof Array ? data.start_time[0] : data.start_time);
         ws.getCell('F3').value = 'To : ' + dateutils.getDDMMYYYY(data.end_time instanceof Array ? data.end_time[data.end_time.length - 1] : data.end_time);
 
@@ -517,16 +519,18 @@ exports.getActivityReport2 = function (data, callback) { //ritika raj
             ws.mergeCells('F' + i + ':H' + i);
         }
 
-        if (device.reg_no) {
-            ws.getCell('A6').value = 'Reg No : ' + device.reg_no;
-            data.reportName = device.reg_no + "_Activity";
-        } else if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
-            ws.getCell('A6').value = 'Reg No : ' + activeusersmanager.getDeviceWithIMEI(key).reg_no;
-            data.reportName = activeusersmanager.getDeviceWithIMEI(key).reg_no + "_Activity";
-        } else {
-            ws.getCell('A6').value = 'Reg No : ' + key;
-            data.reportName = key + "_Activity";
-        }
+        // if (device.reg_no) {
+        //     ws.getCell('A6').value = 'Reg No : ' + device.reg_no;
+        //     data.reportName = device.reg_no + "_Activity";
+        // } else if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
+        //     ws.getCell('A6').value = 'Reg No : ' + activeusersmanager.getDeviceWithIMEI(key).reg_no;
+        //     data.reportName = activeusersmanager.getDeviceWithIMEI(key).reg_no + "_Activity";
+        // } else {
+        //     ws.getCell('A6').value = 'Reg No : ' + key;
+        //     data.reportName = key + "_Activity";
+        // }
+        ws.getCell('A6').value = 'Reg No : ' + data.reg_no;
+        data.reportName = data.reg_no + "_Activity";
         ws.getCell('F6').value = 'From : ' + dateutils.getDDMMYYYY(data.start_time instanceof Array ? data.start_time[0] : data.start_time);
         ws.getCell('F7').value = 'To : ' + dateutils.getDDMMYYYY(data.end_time instanceof Array ? data.end_time[data.end_time.length - 1] : data.end_time);
 
@@ -620,16 +624,18 @@ exports.getDriverActivityReport = function (data, callback) {
             ws.mergeCells('F' + i + ':J' + i);
         }
 
-        if (device.reg_no) {
-            ws.getCell('A3').value = 'Reg No : ' + device.reg_no;
-            data.reportName = device.reg_no + "_Activity";
-        } else if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
-            ws.getCell('A3').value = 'Reg No : ' + activeusersmanager.getDeviceWithIMEI(key).reg_no;
-            data.reportName = activeusersmanager.getDeviceWithIMEI(key).reg_no + "_Activity";
-        } else {
-            ws.getCell('A3').value = 'Reg No : ' + key;
-            data.reportName = key + "_Activity";
-        }
+        // if (device.reg_no) {
+        //     ws.getCell('A3').value = 'Reg No : ' + device.reg_no;
+        //     data.reportName = device.reg_no + "_Activity";
+        // } else if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
+        //     ws.getCell('A3').value = 'Reg No : ' + activeusersmanager.getDeviceWithIMEI(key).reg_no;
+        //     data.reportName = activeusersmanager.getDeviceWithIMEI(key).reg_no + "_Activity";
+        // } else {
+        //     ws.getCell('A3').value = 'Reg No : ' + key;
+        //     data.reportName = key + "_Activity";
+        // }
+        ws.getCell('A3').value = 'Reg No : ' + data.reg_no;
+        data.reportName = data.reg_no + "_Activity";
         ws.getCell('F2').value = 'From : ' + dateutils.getDDMMYYYY( data.start_time instanceof Array ? data.start_time[0] : data.start_time);
         ws.getCell('F3').value = 'To : ' + dateutils.getDDMMYYYY(data.end_time instanceof Array ? data.end_time[data.end_time.length - 1] : data.end_time);
 
@@ -1507,16 +1513,18 @@ exports.getIdleReport = function (data, callback) {
             ws.mergeCells('C' + i + ':E' + i);
         }
 
-        if (device.reg_no) {
-            ws.getCell('A3').value = 'Reg No : ' + device.reg_no;
-            data.reportName = device.reg_no + "_Idle";
-        } else if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
-            ws.getCell('A3').value = 'Reg No : ' + activeusersmanager.getDeviceWithIMEI(key).reg_no;
-            data.reportName = activeusersmanager.getDeviceWithIMEI(key).reg_no + "_Idle";
-        } else {
-            ws.getCell('A3').value = 'Reg No : ' + key;
-            data.reportName = key + "_Idle";
-        }
+        // if (device.reg_no) {
+        //     ws.getCell('A3').value = 'Reg No : ' + device.reg_no;
+        //     data.reportName = device.reg_no + "_Idle";
+        // } else if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
+        //     ws.getCell('A3').value = 'Reg No : ' + activeusersmanager.getDeviceWithIMEI(key).reg_no;
+        //     data.reportName = activeusersmanager.getDeviceWithIMEI(key).reg_no + "_Idle";
+        // } else {
+        //     ws.getCell('A3').value = 'Reg No : ' + key;
+        //     data.reportName = key + "_Idle";
+        // }
+         ws.getCell('A3').value = 'Reg No : ' + data.reg_no;
+        data.reportName = data.reg_no + "_Idle";
         ws.getCell('C2').value = 'From : ' + dateutils.getDDMMYYYY(data.start_time instanceof Array ? data.start_time[0] : data.start_time);
         ws.getCell('C3').value = 'To : ' + dateutils.getDDMMYYYY(data.end_time instanceof Array ? data.end_time[data.end_time.length - 1] : data.end_time);
 

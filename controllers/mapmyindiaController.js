@@ -73,7 +73,7 @@ router.get("/atlas/*", function (req, res, next) {
 		//base_url = base_url + req.query.q;
 		if (base_url) {
 			request(base_url, function (error, response, body) {
-				if (!error && (response.statusCode < 400)) {
+				if (!error && (response.body || body) && (response.statusCode < 400)) {
 					try{
 						body = JSON.parse(response.body || body);
 						return res.status(response.statusCode).send(body);
