@@ -96,6 +96,12 @@ Alarm.getAlarm = function (request, callback) {
 		query = query + " AND imei=? ";
 		aParams.push(request.imei);
 	}
+
+	if (request.vehicle_no) {
+		query = query + " AND vehicle_no=? ";
+		aParams.push(request.vehicle_no);
+	}
+
 	if (request.gid) {
 		query = query + " AND gid=? ";
 		aParams.push(request.gid);
@@ -108,7 +114,7 @@ Alarm.getAlarm = function (request, callback) {
 		query = query + " AND public_link=? ";
 		aParams.push(request.public_link);
 	}
-	if (request.atype || request.imei || request.enabled || request.gid || request.public_link) {
+	if (request.atype || request.imei || request.vehicle_no || request.enabled || request.gid || request.public_link) {
 		query = query + " ALLOW FILTERING";
 	}
 	cassandraDbInstance.execute(query, aParams, oConfig, function (err, result) {
