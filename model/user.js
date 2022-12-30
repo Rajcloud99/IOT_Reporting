@@ -428,7 +428,7 @@ User.getUserById = function (request, callback) {
 		prepare: 1
 	};
 	const aParams = [prepareString(request.subUser)];
-	let query = "SELECT mobile,type, user_id ,email,name, total_device,stock , password FROM  " + database.table_users +  " WHERE user_id IN ("+aParams+")";
+	let query = "SELECT mobile,type, user_id ,email,name, total_device,stock ,pan , password FROM  " + database.table_users +  " WHERE user_id IN ("+aParams+")";
 	cassandraDbInstance.execute(query,oConfig, function (err, result) {
 		if (err) {
 			winston.error('User.getUserById', err);
@@ -453,7 +453,7 @@ function prepareString(aUsers){
 }
 
 User.getAllUsers1 = function (callback) {
-	let str1 = 'harsh';
+	let str1 = 'Govind';
 	let str = "'" + str1 + "'";
 	const query1 = 'SELECT user_id,type,name,sub_users,total_device,stock  FROM users WHERE user_id = ' + str;
 	// const query = 'SELECT user_id,type,name,sub_users,total_device,stock  FROM ' + database.table_users;

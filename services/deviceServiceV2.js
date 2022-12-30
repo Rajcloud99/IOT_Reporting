@@ -118,6 +118,14 @@ function clubDrivesAndStops(device, callback) {
 
         device.data[i - 2].duration = parseInt((new Date(device.data[i].end_time).getTime() - new Date(device.data[i - 2].start_time).getTime()) / 1000);
         device.data[i - 2].distance += device.data[i].distance;
+        //copy points from removable ADAS to prev ADAS
+        if(device.data[i-2].points && device.data[i-2].points.length){
+            if(device.data[i].points && device.data[i].points.length){
+                device.data[i-2].points = device.data[i-2].points.concat(device.data[i].points);
+            }
+        }else if(device.data[i].points && device.data[i].points.length){
+            device.data[i-2].points = device.data[i].points;
+        }
         device.data.splice(i - 1, 2);
         i--;
     }
@@ -220,6 +228,7 @@ function processADASlotReport(request, callback) {
         callback(null, devices);
     });
 }
+
 function getSlotDate(slot_start,device_start_time){
     let slot_date = new Date(device_start_time);
     if(new Date(device_start_time).getHours() < new Date(slot_start).getHours()){

@@ -184,7 +184,12 @@ Device.associateDeviceWithUser = function (request, callback) {
 	for (let dev = 0; dev < request.devices.length; dev++) {
 		aParam.push(parseInt(request.devices[dev]), request.new_uid)
 	}
-	const getDeviceInventoryQuery1 = 'SELECT * FROM ' + database.table_device_inventory + ' WHERE imei = ' + aParam[0] +  ' AND user_id =' +  "'" + request.selected_uid + "'";
+	let getDeviceInventoryQuery1;
+	if(request.isSelected_uid){
+		getDeviceInventoryQuery1 = 'SELECT * FROM ' + database.table_device_inventory + ' WHERE imei = ' + aParam[0] +  ' AND user_id =' +  "'" + request.selected_uid + "'";
+	}else{
+		getDeviceInventoryQuery1 = 'SELECT * FROM ' + database.table_device_inventory + ' WHERE imei = ' + aParam[0];
+	}
 	const getDeviceInventoryQuery = 'SELECT * FROM ' + database.table_device_inventory + ' WHERE imei = ' + aParam[0] +  ' AND user_id =' +  "'" + request.new_uid + "'";
 	cassandraDbInstance.execute(getDeviceInventoryQuery1, [], function (err, result) {
 		if (err) {
@@ -238,21 +243,23 @@ Device.associateDeviceWithUser = function (request, callback) {
 								cassandraDbInstance.execute(query1, aParam, {prepare: true});
 							}
 						});
-						User.getUser(request.selected_uid, function (err, res) {
-							const response = {status: 'ERROR', message: ""};
-							if (err) {
-								response.message = err.toString();
-							} else if (!res) {
-								response.message = 'user not found';
-							}else{
-								let userData = res;
-								let totalStock = (userData.stock || 0) - 1;
-								const aParam = [];
-								aParam.push(request.selected_uid);
-								const query1 = 'UPDATE ' + database.table_users + ' SET stock = ' + totalStock +  ' WHERE user_id = ?';
-								cassandraDbInstance.execute(query1, aParam, {prepare: true});
-							}
-						});
+						if(request.isSelected_uid){
+							User.getUser(request.selected_uid, function (err, res) {
+								const response = {status: 'ERROR', message: ""};
+								if (err) {
+									response.message = err.toString();
+								} else if (!res) {
+									response.message = 'user not found';
+								}else{
+									let userData = res;
+									let totalStock = (userData.stock || 0) - 1;
+									const aParam = [];
+									aParam.push(request.selected_uid);
+									const query1 = 'UPDATE ' + database.table_users + ' SET stock = ' + totalStock +  ' WHERE user_id = ?';
+									cassandraDbInstance.execute(query1, aParam, {prepare: true});
+								}
+							});
+						}
 						return callback(err, result);
 					});
 				}

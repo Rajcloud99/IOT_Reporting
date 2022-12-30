@@ -68,7 +68,7 @@ Alarm.getAlarm = function (request, callback) {
 		prepare: 1
 	};
 	if (request.pageState) {
-		oConfig.pageState = new Buffer(request.pageState);
+		oConfig.pageState = new Buffer(request.pageState,'hex');
 	}
 	if (request.row_count) {
 		oConfig.fetchSize = request.row_count;
@@ -129,6 +129,10 @@ Alarm.getAlarm = function (request, callback) {
 		}
 		if (result && result.meta) {
 			oRes.pageState = result.meta.pageState;
+		}else if(result.pageState){
+			oRes.pageState =  new Buffer(result.pageState,'hex');
+		}else{
+			console.log('result',result);
 		}
 		callback(err, oRes);
 	});
