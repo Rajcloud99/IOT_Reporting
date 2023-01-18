@@ -413,8 +413,8 @@ exports.getActivityReport = function (data, callback) {
         //     ws.getCell('A3').value = 'Reg No : ' + key;
         //     data.reportName = key + "_Activity";
         // }
-        ws.getCell('A3').value = 'Reg No : ' + device.reg_no;
-        data.reportName = device.reg_no + "_Activity";
+        ws.getCell('A3').value = 'Reg No : ' + (data.reg_no || device.reg_no);
+        data.reportName = (data.reg_no || device.reg_no) + "_Activity";
         ws.getCell('F2').value = 'From : ' + dateutils.getDDMMYYYY(data.start_time instanceof Array ? data.start_time[0] : data.start_time);
         ws.getCell('F3').value = 'To : ' + dateutils.getDDMMYYYY(data.end_time instanceof Array ? data.end_time[data.end_time.length - 1] : data.end_time);
 

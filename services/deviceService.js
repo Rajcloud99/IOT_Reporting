@@ -72,7 +72,7 @@ let registerGpsGaadi = function (err, res) {
 	if (err) {
 		return callback(err);
 	} else if (res) {
-		GpsGaadi.registerGpsGaadi(res, callback);
+		GpsGaadi.registerGpsGaadi1(res, callback);
 	}
 };
 

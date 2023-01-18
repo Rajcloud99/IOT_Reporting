@@ -322,6 +322,42 @@ GpsGaadi.updateGpsGaadisByTrip = function (request, callback) {
     });
 };
 
+GpsGaadi.registerGpsGaadi1 = function (GpsGaadis, callback) {  // todo  update for multiple user for assosiate device with user
+	const aQueries = [];
+	for (let dev = 0; dev < GpsGaadis.length; dev++) {
+		const getDeviceInventoryQuery = 'SELECT * FROM ' + database.table_gpsgaadi + ' WHERE imei = ' + GpsGaadis[dev].imei +  ' AND user_id =' +  "'" + GpsGaadis[dev].user_id + "'";
+		cassandraDbInstance.execute(getDeviceInventoryQuery, [], function (err, result) {
+			if (err) {
+				winston.error('Device.associateDeviceWithUser', err);
+			}
+			if (result && result.rows && result.rows.length === 0) {
+				//GpsGaadis[dev].status = 'offline';
+				GpsGaadis[dev].created_at = Date.now();
+				GpsGaadis[dev].ownership = 'owner';
+				const oRet = prepareCreateQuery(GpsGaadis[dev]);
+				const query = 'INSERT INTO ' + database.table_gpsgaadi + ' (' + oRet.sQuery + ') VALUES(' + oRet.sValues + ')';
+				aQueries.push({
+					query: query,
+					params: oRet.aParam
+				});
+				cassandraDbInstance.batch(aQueries, {
+					prepare: true
+				}, function (err, result) {
+					if (err) {
+						callback(err, null);
+						winston.error('GpsGaadi.registerGpsGaadi', err);
+						return;
+					}
+					if (!result) {
+						return callback(err, null);
+					}
+					return callback(err, result);
+				});
+			}
+		});
+	}
+};
+
 GpsGaadi.registerGpsGaadi = function (GpsGaadis, callback) {
 	const aQueries = [];
 	for (let dev = 0; dev < GpsGaadis.length; dev++) {
