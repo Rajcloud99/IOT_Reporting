@@ -374,13 +374,61 @@ router.post("/getDeviceByUser", function (req, res, next) {
 });
 
 router.post("/removeDeviceFromUser", function (req, res, next) {
-    Device.removeDevicesForUserIdAsync(req.body).then(function(oUser){
-        if(oUser){
-            return res.status(200).json({"status": "OK","message": "Device Removed Successfully","data":oUser});
-        }else{
-            return res.status(200).json({"status": "ERROR","message": "Either user_id,user token  are wrong incorrect"});
+    User.getUser(req.body.selected_uid, function (err, oUser) {
+        if (err) {
+            response.message = err.toString();
+            return res.json(response);
+        } else if (!oUser) {
+            response.message = 'user not found';
+            return res.json(response);
+        } else {
+            let request = {selected_uid:req.body.selected_uid ,imeiList:true,imei:req.body.imei};
+            Device.removeDevicesForUserId(req.body, function (err, result) {
+                let response = {
+                    status: 'ERROR',
+                    message: ""
+                };
+                if (err) {
+                    response.message = err.toString();
+                    return res.json(response);
+                } else if (!result) {
+                    response.message = 'Device removal failed';
+                    return res.json(response);
+                } else {
+                    response.status = 'OK';
+                    response.message = 'Devices removed successfully';
+                    // if (req.user_role === 'user') {
+                        request.devices = [];
+                        request.devices.push(req.body.imei);
+                        Device.getDevices(request, function (err, aData) {
+                            let callback = function (err, aRegisteredData) {
+                                if (err) {
+                                    winston.error(err);
+                                }
+                            };
+                            if (err) {
+                                return callback(err);
+                            } else if (aData) {
+                                GpsGaadi.getGpsGaadiList(request,function(err,gResp){
+                                    if (err) {
+                                        response.message = err.message;
+                                    }
+                                    if(gResp && gResp.data){
+                                        for(const d of gResp.data){
+                                            let request = {selected_uid:d.user_id ,created_at:d.created_at};
+                                            GpsGaadi.removeGpsGaadi(request,function () {})
+                                        }
+                                        GpsGaadi.registerGpsGaadi(aData, callback);
+                                    }
+                                });
+                            }
+                        });
+                    // }
+                    return res.status(200).json(response);
+                }
+            })
         }
-    }).catch(next);
+    });
 });
 
 

@@ -147,7 +147,11 @@ GpsGaadi.getGpsGaadiList = function (request, callback) {
 	let query;
 	let aParams;
 	/***If imei list is not provided ***/
-	if (!request.device_id && (request.selected_uid || request.login_uid)) {
+    if(request.imeiList){
+		query = 'SELECT * FROM ' + database.table_gpsgaadi + ' WHERE imei = ? ';
+		aParams = [request.imei];
+	}
+	else if (!request.device_id && (request.selected_uid || request.login_uid)) {
 		query = 'SELECT * FROM ' + database.table_gpsgaadi + ' WHERE user_id = ? ';
 		aParams = [request.selected_uid || request.login_uid];
 	}else {
@@ -405,7 +409,6 @@ GpsGaadi.addGpsGaadiFromPool = function (GpsGaadis, callback) {
 GpsGaadi.removeGpsGaadi = function (request, callback) {
 	request.selected_uid = request.selected_uid || request.login_uid;
 	const query = 'DELETE FROM ' + database.table_gpsgaadi + ' WHERE user_id = ?  AND created_at = ?';
-
 	cassandraDbInstance.execute(query, [request.selected_uid, request.created_at], {
 		prepare: true
 	}, function (err, result) {

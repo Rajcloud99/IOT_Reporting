@@ -1201,7 +1201,7 @@ router.post("/devices", function (req, res, next) {
         }
         return res.status(500).json(response);
     }
-    request.project = request.project || {device_type:1,imei:1}
+    request.project = request.project || {device_type:1,imei:1};
     gpsgaadiService.getGpsGaadiForTripBasedGps(request, response => {
         //response = otherUtils.pruneEmpty(response);
         if(res.headersSent){
@@ -1211,6 +1211,39 @@ router.post("/devices", function (req, res, next) {
         }
     });
 });
+
+router.post("/allocatedDevices", function (req, res, next) {
+    let request = req.body;
+    console.log('start time ', new Date());
+    if (request.device_id instanceof Array) {
+        let tempD = [];
+        for (let k = 0; k < request.device_id.length; k++) {//remove null imeis
+            if (request.device_id[k] && request.device_id[k].toString().length < 16) {
+                tempD.push(request.device_id[k]);
+            }
+        }
+        request.device_id = tempD;
+    }
+    request.client = 'web';
+    request.request = 'gpsgaadi_by_uid';
+    if(!request.selected_uid){
+        let response = {
+            status:'Error',
+            message:'GPS account Id not linked with LMS. Contact your admin'
+        }
+        return res.status(500).json(response);
+    }
+    //request.project = request.project || {device_type:1,imei:1}
+    gpsgaadiService.getGpsGaadiForTripBasedGps(request, response => {
+        //response = otherUtils.pruneEmpty(response);
+        if(res.headersSent){
+            //return res.status(200).json(response);
+        }else{
+            return res.status(200).json(response);
+        }
+    });
+});
+
 router.post("/combinedHalts", function (req, res, next) {//new version
     let request = req.body;
     console.log('combinedHalts ', new Date());

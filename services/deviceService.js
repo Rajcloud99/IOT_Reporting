@@ -111,9 +111,22 @@ exports.associateDeviceWithUser = function (request, callback) {
 				} else {
 					response.status = 'OK';
 					response.message = 'Device update done succefully';
-					if (request.user_role === 'user') {
-						Device.getDevices(request, registerGpsGaadi);
-					}
+					// if (request.user_role === 'user') {
+						request.imei = parseInt(request.devices[0]);
+						request.imeiList = true;
+						GpsGaadi.getGpsGaadiList(request,function(err,gResp){
+							if (err) {
+								response.message = err.message;
+							}
+							if(gResp && gResp.data){
+								for(const d of gResp.data){
+									let request = {selected_uid:d.user_id ,created_at:d.created_at};
+									GpsGaadi.removeGpsGaadi(request,function () {})
+								}
+								Device.getDevices(request, registerGpsGaadi);
+							}
+						});
+					// }
 				}
 				return callback(response);
 			});
@@ -1616,6 +1629,7 @@ function getGpsGaadiInfo(oDevice, callback) {
 };
 
 function fillLandmarkIfRequired(adas, callback) {
+	console.log(adas.data);
 	async.eachSeries(adas.data, function (datum, done) {
 		Promise.resolve()
 			.then(function () {
