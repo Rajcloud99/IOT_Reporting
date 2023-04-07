@@ -86,7 +86,7 @@ exports.getParkingReport = function (data, callback) {
 
         let ws;
         if (device.reg_no) {
-            ws = workbook.addWorksheet(device.reg_no);
+            ws = workbook.addWorksheet(data.reg_no || device.reg_no);
         } else if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
             ws = workbook.addWorksheet(activeusersmanager.getDeviceWithIMEI(key).reg_no);
         } else {
@@ -153,7 +153,7 @@ exports.getParkingReportWCPL = function (data, callback) {
 
         let ws;
         if (device.reg_no) {
-            ws = workbook.addWorksheet(device.reg_no);
+            ws = workbook.addWorksheet(data.reg_no || device.reg_no);
         } else if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
             ws = workbook.addWorksheet(activeusersmanager.getDeviceWithIMEI(key).reg_no);
         } else {
@@ -383,14 +383,14 @@ exports.getActivityReport = function (data, callback) {
 
     for (const key in data.data) {
         const device = data.data[key];
-        let ws;
-        if (device.reg_no) {
-            ws = workbook.addWorksheet(device.reg_no);
-        } else if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
-            ws = workbook.addWorksheet(activeusersmanager.getDeviceWithIMEI(key).reg_no);
-        } else {
-            ws = workbook.addWorksheet(key);
-        }
+        let ws = workbook.addWorksheet(data.reg_no || device.reg_no);
+        // if (device.reg_no) {
+        //     ws = workbook.addWorksheet(data.reg_no || device.reg_no);
+        // } else if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
+        //     ws = workbook.addWorksheet(activeusersmanager.getDeviceWithIMEI(key).reg_no);
+        // } else {
+        //     ws = workbook.addWorksheet(key);
+        // }
 
         formatTitle(ws, 9, 'Activity Report');
 
@@ -486,14 +486,14 @@ exports.getActivityReport2 = function (data, callback) { //ritika raj
     let processed = 0;
     for (const key in data.data) {
         const device = data.data[key];
-        let ws;
-        if (device.reg_no) {
-            ws = workbook.addWorksheet(device.reg_no);
-        } else if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
-            ws = workbook.addWorksheet(activeusersmanager.getDeviceWithIMEI(key).reg_no);
-        } else {
-            ws = workbook.addWorksheet(key);
-        }
+        let ws = workbook.addWorksheet(data.reg_no);
+        // if (device.reg_no) {
+        //     ws = workbook.addWorksheet(device.reg_no);
+        // } else if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
+        //     ws = workbook.addWorksheet(activeusersmanager.getDeviceWithIMEI(key).reg_no);
+        // } else {
+        //     ws = workbook.addWorksheet(key);
+        // }
 
         formatTitle(ws, 8, 'Activity Report');
 
@@ -606,7 +606,7 @@ exports.getDriverActivityReport = function (data, callback) {
         const device = data.data[key];
         let ws;
         if (device.reg_no) {
-            ws = workbook.addWorksheet(device.reg_no);
+            ws = workbook.addWorksheet(data.reg_no || device.reg_no);
         } else if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
             ws = workbook.addWorksheet(activeusersmanager.getDeviceWithIMEI(key).reg_no);
         } else {
@@ -1495,7 +1495,7 @@ exports.getIdleReport = function (data, callback) {
         const device = data;
         let ws;
         if (device.reg_no) {
-            ws = workbook.addWorksheet(device.reg_no);
+            ws = workbook.addWorksheet(data.reg_no || device.reg_no);
         } else if (activeusersmanager.getDeviceWithIMEI(key) && activeusersmanager.getDeviceWithIMEI(key).reg_no) {
             ws = workbook.addWorksheet(activeusersmanager.getDeviceWithIMEI(key).reg_no);
         } else {

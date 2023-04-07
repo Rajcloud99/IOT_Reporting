@@ -151,24 +151,36 @@ function removeAlarm(request, callback) {
 }
 
 function addAlarm(request, callback) {
-	Alarm.createAlarm(request, function (err, res) {
-		const response = {status: 'ERROR', message: "", index: request.index};
-		if (err) {
-			response.message = err.toString();
-		} else if (!res) {
-			response.message = 'Alarm registration failed';
+	const oReq = {
+		atype:request.atype,
+		selected_uid: request.selected_uid || request.login_uid,
+		vehicle_no: request.vehicle_no
+	};
+	checkAlarm(oReq, function (reppp) {
+		if (reppp.status === 'OK') {
+			Alarm.createAlarm(request, function (err, res) {
+				const response = {status: 'ERROR', message: "", index: request.index};
+				if (err) {
+					response.message = err.toString();
+				} else if (!res) {
+					response.message = 'Alarm registration failed';
+				} else {
+					response.status = 'OK';
+					response.message = request.atype + ' alarm setup done succefully';
+					response.atype = request.atype;
+					response.imei = request.imei;
+					response.vehicle_no = request.vehicle_no;
+					if(request.imei){
+						require('../utils/receivermanager').sendAlarmUpdate(request.imei);
+					}
+				}
+				return callback(response);
+			});
 		} else {
-			response.status = 'OK';
-			response.message = request.atype + ' alarm setup done succefully';
-			response.atype = request.atype;
-			response.imei = request.imei;
-			response.vehicle_no = request.vehicle_no;
-			if(request.imei){
-				require('../utils/receivermanager').sendAlarmUpdate(request.imei);
-			}
+			return callback(reppp);
 		}
-		return callback(response);
 	});
+
 }
 
 module.exports.createAlarm = createAlarm;
