@@ -2204,7 +2204,7 @@ module.exports = {
 	limit:{
 		speed:67
 	},
-	geographyUrl: "http://3.6.84.38:4242",
+	geographyUrl: "http://13.235.119.20:4242",
 	fileApp:{
 		port:8080,
 		startServer:true
