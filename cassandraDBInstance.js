@@ -13,12 +13,15 @@ if (!config.shouldWriteToDb) {
 	cassandraDbInstance = {execute: require('sinon').spy()};
 } else {
 	const cassandraDriver = require('cassandra-driver');
-	console.log('connected to cassandra nodes '+database.nodes.toString());
 	cassandraDbInstance = new cassandraDriver.Client({
 		contactPoints: database.nodes,
 		keyspace: database.keyspace,
 		localDataCenter: 'datacenter1'//todo change as for your name
 	});
+	if(cassandraDbInstance){
+		let msg = cassandraDbInstance.connected ? 'Connected ' : 'Not Connected ';
+		console.log(msg +' to cassandra nodes '+database.nodes.toString());
+	}
 }
 
 module.exports = cassandraDbInstance;

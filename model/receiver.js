@@ -8,7 +8,13 @@ const net = require('net');
 const split = require('split');
 const feedtype = require('../config').feedtype;
 const socketmanager = require('../utils/socketmanager');
-const locationServer = require('../locationServer');
+const config = require("../config");
+let locationServer;
+if (config.driver && config.driver.startServer) {
+	locationServer = require('../locationServer');
+}else {
+	console.log('locationServer service is NOT connected ' + config.receiverConnect.port);
+}
 
 class Receiver {
 	constructor(ip) {
@@ -36,6 +42,7 @@ class Receiver {
 		const _this = this;
 		this.socket = new net.Socket();
 		this.socket.connect(Receiver.port, this.ip, function () {
+            console.log('Receiver Connected at port and ip ',Receiver.port, this.ip);
 			_this.sendMessage(null);
 		});
 		const stream = this.socket.pipe(split());
@@ -45,7 +52,7 @@ class Receiver {
 				data = JSON.parse(data);
 				_this.handleData(data);
 			} catch (err) {
-				winston.error('json parse err', err);
+				winston.error('json parse err connect receiver ', err);
 			}
 		});
 
@@ -72,11 +79,16 @@ class Receiver {
 				switch (data.msg.request) {
 					case "live_feed":
 						socketmanager.sendMessageToFeedManager(data.msg);
-						locationServer.sendPingToSocket(data.msg);
+						if(locationServer && locationServer.sendPingToSocket){
+							locationServer.sendPingToSocket(data.msg);
+						}
+
 						break;
                     case "live_feedV2":
                         socketmanager.sendMessageToFeedManager(data.msg);
-                        locationServer.sendPingToSocket(data.msg);
+						if(locationServer && locationServer.sendPingToSocket){
+							locationServer.sendPingToSocket(data.msg);
+						}
                         break;
 					case "commands":
 						socketmanager.sendMessageToCommandManager(data.msg);
