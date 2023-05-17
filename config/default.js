@@ -23,8 +23,8 @@ module.exports = {
 	"tracksheetCronTime":720000,
 	"tripSyncCronTime":59,//in minutes
 	"database": {
-		"nodes": ["localhost"],
-        //"nodes":["15.206.33.235","101.53.139.123"],
+		//"nodes": ["localhost"],
+        "nodes":["15.206.33.235","101.53.139.123"],
 		"keyspace": "gps_ups",
         "enable_email": true,
         "enable_sms": true,
@@ -2124,8 +2124,6 @@ module.exports = {
 		gpsgaadi_by_uid: 'gpsgaadi_by_uid',
 		get_devide_types: 'get_devide_types',
 		gpsgaadi_by_reg_no: 'gpsgaadi_by_reg_no',
-		get_trips: 'get_trips',
-		download_report_trip: 'download_report_trip',
 		add_vehicle: 'add_vehicle',
 		add_imei: 'add_imei',
 		share_location: 'share_location',
@@ -2139,9 +2137,6 @@ module.exports = {
 		report_activity: 'report_activity',
 		download_report_activity: 'download_report_activity',
 		download_report_activity_trip: 'download_report_activity_trip',
-		create_trip: 'create_trip',
-		update_trip: 'update_trip',
-		remove_trip: 'remove_trip',
 		register_fcm: 'register_fcm',
 		get_device_config: 'get_device_config',
 		get_device_info: 'get_device_info',
@@ -2176,7 +2171,6 @@ module.exports = {
 		remove_feature: 'remove_feature',
 		daily_uptime: 'daily_uptime',
 		last_online: 'last_online',
-		get_vehicle_trips: 'get_vehicle_trips',
 		report_ac: 'report_ac',
 		report_acc: 'report_acc',
 		tracksheetData:'tracksheetData',
@@ -2210,5 +2204,25 @@ module.exports = {
 	limit:{
 		speed:67
 	},
-	geographyUrl:"http://13.235.119.20:4242"
+	geographyUrl: "http://3.6.84.38:4242",
+	fileApp:{
+		port:8080,
+		startServer:true
+	},
+	io_http:{
+		port:5001,
+		startServer:true
+	},
+	receiverConnect:{
+		port:5000,
+		startConn:true
+	},
+	reporting:{
+		port:8081,
+		startServer:true
+	},
+	driver:{
+		port:8081,
+		startServer:true
+	}
 };
