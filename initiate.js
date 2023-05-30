@@ -52,8 +52,8 @@ if (config.fileApp && config.fileApp.startServer) {
     }));
     fileApp.use(cookieParser());
     fileApp.use(express.static(__dirname + '/files'));
-    fileApp.use('/api/mobile', require('./controllers/mDevicesController'));
-    fileApp.use('/api/androidversion', require('./controllers/appVersionController'));
+    //fileApp.use('/api/mobile', require('./controllers/mDevicesController'));
+    //fileApp.use('/api/androidversion', require('./controllers/appVersionController'));
     fileApp.listen(config.fileApp.port);
     console.log('FileApp service is running on '+ config.fileApp.port);
 }else{
